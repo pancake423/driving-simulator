@@ -34,3 +34,43 @@ class AbstractCar(pygame.sprite.Sprite):
         
         self.rect = self.image.getrect(center=oldCenter)
         
+    def move(self):
+        delta_x = self.velocity * math.cos(self.angle)
+        delta_y = self.velocity * math.sin(self.angle)
+        
+        self.x += delta_x
+        self.y += delta_y
+        
+class PlayerCar(AbstractCar):
+    def __init__(self):
+        super().__init__(self)
+        
+    def player_input(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            self.accelerate()
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            self.decelerate()
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.turn("left")
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.turn("right")
+            
+    def update(self):
+        player_input()
+        self.move()
+            
+class BotCar(AbstractCar):
+    def __init__(self):
+        super().__init__(self)
+        self.target = (self.rect.center)
+    
+    #Move the bot towards the target
+    def bot_move(self):
+        
+    
+    def update(self):
+        bot_move()
+        self.move()
+    
+    
