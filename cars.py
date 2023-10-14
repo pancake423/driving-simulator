@@ -13,13 +13,13 @@ class AbstractCar(pygame.sprite.Sprite):
         self.turnSpeed = 2
         self.velocity = 0
         self.acceleration = 2
-        self.angle = 0
+        self.angle = 0 #Direction the car is facing
         
     def accelerate(self):
         self.velocity += self.acceleration
         self.velocity = min(maxSpeed, velocity)
     
-    def deccelerate(self):
+    def decelerate(self):
         self.velocity -= self.acceleration
         
     def turn(self, dir):
