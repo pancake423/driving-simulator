@@ -13,7 +13,7 @@ play_game = "Play"
 quit_game = "Quit"
 
 #define and set font type(s)
-title_font_type = 'fonts/Get Now.ttf'
+menu_font_type = 'fonts/Get Now.ttf'
 
 #set play_state to True to control game loop
 play_state = True
@@ -26,6 +26,9 @@ level_state = True
 
 #define and initialize score
 score = 0
+
+#set amount of levels
+level_count = 10
 
 #for screen width and heigth, defined and initialized here to make changing easy
 resW = 800
@@ -41,14 +44,19 @@ clock = pygame.time.Clock()
 pygame.font.init()
 
 #set title menu fonts to Fixedsys regular, whose file name is '8514fix.fon'
-title_font = pygame.font.Font(title_font_type, 50)
-menu_font = pygame.font.Font(title_font_type, 25)
+title_font = pygame.font.Font(menu_font_type, 50)
+menu_font = pygame.font.Font(menu_font_type, 25)
 
 #creates a surface for rendering the title in the pygame window
 title_surf = title_font.render(game_title, False, 'blue')
 title_rect = title_surf.get_rect(midtop = (resW / 2, 50))
 
 #creates a surface for rendering the levels of the level select menu in the pygame window
+level_surf_list = []
+level_rect_list = []
+for i in range(level_count):
+    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'blue'))
+    level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 50 + (i * 50))))
 
 
 #creates a surface for rendering the title menu options ('Play' and 'Quit')
@@ -76,6 +84,7 @@ while play_state:
                 if mouse_state[0]:
                     if play_rect.collidepoint(mouse_pos):
                         title_state = False
+                        screen.fill('black')
                     elif quit_rect.collidepoint(mouse_pos):
                         title_state = False
                         play_state = False
@@ -84,9 +93,27 @@ while play_state:
                 level_state = False
                 play_state = False
 
-    #if title_state == False and level_state == True:
+    if title_state == False and level_state == True:
+        for i in range(level_count):
+            screen.blit(level_surf_list[i], level_rect_list[i])
 
-    
+        #get mouse position to check if mouse is over any of the levels
+        mouse_pos = pygame.mouse.get_pos()
+
+        #checks if mouse is positioned over a level and if leck click is pressed
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_state = pygame.mouse.get_pressed()
+                if mouse_state[0]:
+                    for i in range(level_count):
+                        if level_rect_list[i].collidepoint(mouse_pos):
+                            level_state = False
+                            screen.fill('black')
+                elif event.type == pygame.QUIT:
+                    title_state = False
+                    level_state = False
+                    play_state = False
+
     #checks the most recent event to see if the player clicked the X button
     #at the top right of the window border
     for event in pygame.event.get():
@@ -96,7 +123,6 @@ while play_state:
             play_state = False
 
     #update screen with a background
-    #screen.fill('black')
     pygame.display.update()
     clock.tick(60)
 
