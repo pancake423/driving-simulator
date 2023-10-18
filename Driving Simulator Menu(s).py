@@ -109,10 +109,10 @@ while play_state:
                         if level_rect_list[i].collidepoint(mouse_pos):
                             level_state = False
                             screen.fill('black')
-                elif event.type == pygame.QUIT:
-                    title_state = False
-                    level_state = False
-                    play_state = False
+            elif event.type == pygame.QUIT:
+                title_state = False
+                level_state = False
+                play_state = False
 
     #checks the most recent event to see if the player clicked the X button
     #at the top right of the window border
