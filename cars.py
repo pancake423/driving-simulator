@@ -58,7 +58,7 @@ class PlayerCar(AbstractCar):
             self.turn("right")
             
     def update(self):
-        player_input()
+        self.player_input()
         self.move()
             
 class BotCar(AbstractCar):
