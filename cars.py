@@ -5,12 +5,13 @@ class AbstractCar(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         
-        self.length = 200
+        self.length = 50
         self.maxSpeed = 10
         self.turnSpeed = 0.5
         self.velocity = 0
         self.acceleration = 0.2
         self.angle = 0 #Direction the car is facing
+        self.stopped = False
         
         self.setImage()
         self.mask = pygame.mask.from_surface(self.image)
@@ -20,7 +21,12 @@ class AbstractCar(pygame.sprite.Sprite):
         ratio = self.IMG.get_width() / self.IMG.get_height()
         self.image = pygame.transform.smoothscale(self.IMG, (self.length*ratio, self.length)).convert_alpha()
         self.image = pygame.transform.rotate(self.image, 270 - self.angle)
-        
+      
+    # Makes it easy to stop the car when it hits something
+    def stop(self):
+        self.velocity = 0
+        self.stopped = True
+    
     def accelerate(self):
         self.velocity += self.acceleration
         self.velocity = min(self.maxSpeed, self.velocity)
@@ -54,8 +60,13 @@ class AbstractCar(pygame.sprite.Sprite):
         return self.rect
         
 class PlayerCar(AbstractCar):
+    IMG = pygame.image.load("assets\\unicorn-car-blue.png")
+    START = (1000,400)
+    
     def __init__(self):
         super().__init__()
+        self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
+        self.crash_sound.set_volume(0.3)
         
     def player_input(self):
         keys = pygame.key.get_pressed()
@@ -68,17 +79,28 @@ class PlayerCar(AbstractCar):
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.turn("right")
             
+    def checkCollison(self):
+        if len(pygame.sprite.spritecollide(self,BotCars,False,pygame.sprite.collide_mask)) > 0:
+            self.stop()
+            pygame.mixer.Sound.play(self.crash_sound)
+            self.image = pygame.image.load("assets\\explosion.png")
+            self.image = pygame.transform.smoothscale(self.image, (50, 50)).convert_alpha()
+            
     def update(self):
-        self.player_input()
-        self.move()
+        self.checkCollison()
+        if self.stopped == False:
+            self.player_input()
+            self.move()
             
 class BotCar(AbstractCar):
-    IMG = pygame.image.load("assets\\unicorn-car-red.svg")
+    IMG = pygame.image.load("assets\\unicorn-car-red.png")
     START = (100, 100)
     
     def __init__(self):
         super().__init__()
         self.target = (self.rect.center)
+        self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
+        self.crash_sound.set_volume(0.3)
     
     #Move the bot towards the target
     def bot_move(self):
@@ -115,17 +137,31 @@ class BotCar(AbstractCar):
         
         return distance <= 20
     
+    def checkCollison(self):
+        if len(pygame.sprite.spritecollide(self,player,False,pygame.sprite.collide_mask)) > 0:
+            self.stop()
+            pygame.mixer.Sound.play(self.crash_sound)
+            self.image = pygame.image.load("assets\\explosion.png")
+            self.image = pygame.transform.smoothscale(self.image, (50, 50)).convert_alpha()
+    
     def update(self):
-        self.bot_move()
-        self.move()
+        self.checkCollison()
+        if self.stopped == False:
+            self.bot_move()
+            self.move()
     
 if __name__ == "__main__":
+    pygame.init()
     screen = pygame.display.set_mode((1080, 720))
     pygame.display.set_caption("AI Car demo")
     
-    myGroup = pygame.sprite.Group()
+    BotCars = pygame.sprite.Group()
     myCar = BotCar()
-    myGroup.add(myCar)
+    BotCars.add(myCar)
+    
+    player = pygame.sprite.GroupSingle()
+    playerCar = PlayerCar()
+    player.add(playerCar)
     
     clock = pygame.time.Clock()
     run = True
@@ -133,9 +169,12 @@ if __name__ == "__main__":
         clock.tick(60)
         screen.fill((50, 200, 50))
         myCar.setTarget(pygame.mouse.get_pos())
-        myGroup.update()
+        BotCars.update()
+        player.update()
         pygame.draw.rect(screen, "purple", myCar.getRect())
-        myGroup.draw(screen)
+        pygame.draw.rect(screen, "purple", playerCar.getRect())
+        BotCars.draw(screen)
+        player.draw(screen)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
