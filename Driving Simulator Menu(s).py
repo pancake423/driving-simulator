@@ -71,6 +71,20 @@ play_rect = play_surf.get_rect(topright = (resW - 500, resH / 3))
 quit_surf = menu_font.render(quit_game, False, 'sky blue')
 quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
 
+quit_surf = menu_font.render(quit_game, False, 'purple')
+quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
+
+BotCars = pygame.sprite.Group()
+myCar = BotCar()
+BotCars.add(myCar)
+    
+player = pygame.sprite.GroupSingle()
+playerCar = PlayerCar()
+player.add(playerCar)
+    
+playerCar.setCollide(BotCars)
+myCar.setCollide(player)
+
 #game loop runs until play_state is False
 while play_state:
     
@@ -129,8 +143,6 @@ while play_state:
                 myCar.setTarget(pygame.mouse.get_pos())
                 BotCars.update()
                 player.update()
-                pygame.draw.rect(screen, "purple", myCar.getRect())
-                pygame.draw.rect(screen, "purple", playerCar.getRect())
                 BotCars.draw(screen)
                 player.draw(screen)
             case 2:
