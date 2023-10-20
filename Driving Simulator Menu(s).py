@@ -1,7 +1,5 @@
 #import libraries from pygame extension
 import pygame
-from cars import PlayerCar
-from cars import BotCar
 from cars import PlayerCar, BotCar
 
 
