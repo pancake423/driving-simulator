@@ -1,8 +1,9 @@
 import pygame
 
 class Level:
-	BG_COLOR = (100, 200, 100)
+	BG_COLOR = (100, 200, 100) #grass color
 	LANE_WIDTH = 100 #pixels
+	LINE_WIDTH = 20 #pixels
 
 	def __init__(self, width, height):
 		self.width = width
@@ -21,6 +22,17 @@ class Level:
 		self.sub_layer.draw(target)
 		self.road_layer.draw(target)
 		self.top_layer.draw(target)
+		pass
+
+	def add_horizontal_road(self, start_x, end_x, y):
+		pass
+
+	def add_vertical_road(self, x, start_y, end_y):
+		pass
+
+	def add_intersection(self, x, y):
+		#x, y is the center of the intersection
+		#intersection is a square with a side length of 2*LANE_WIDTH
 		pass
 
 	#internal method used to set the translation of all sprites relative to their starting position.
