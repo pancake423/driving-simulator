@@ -171,8 +171,6 @@ if __name__ == "__main__":
         myCar.setTarget(pygame.mouse.get_pos())
         BotCars.update()
         player.update()
-        pygame.draw.rect(screen, "purple", myCar.getRect())
-        pygame.draw.rect(screen, "purple", playerCar.getRect())
         BotCars.draw(screen)
         player.draw(screen)
         
