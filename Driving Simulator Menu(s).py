@@ -1,8 +1,6 @@
 #import libraries from pygame extension
 import pygame
 from cars import PlayerCar, BotCar
-#from pygame.locals import*
-#pygame.image.load(
 
 #initialize pygame
 pygame.init()
@@ -40,6 +38,10 @@ resH = 720
 
 #set the screen using resW and resH as arguments
 screen = pygame.display.set_mode((resW, resH))
+background = pygame.image.load('assets/standard-road.png').convert()
+background = pygame.transform.smoothscale(background,(resW,resH))
+screen.blit(background, (0,0))
+pygame.display.flip()
 
 #initailize clock for the game
 clock = pygame.time.Clock()
@@ -66,8 +68,8 @@ for i in range(level_count):
 #creates a surface for rendering the title menu options ('Play' and 'Quit')
 play_surf = menu_font.render(play_game, False, 'sky blue')
 play_rect = play_surf.get_rect(topright = (resW - 500, resH / 3))
-quit_surf = menu_font.render(quit_game, False, 'purple')
-quit_rect = quit_surf.get_rect(topright = (resW - 350, (resH / 2) + 50))
+quit_surf = menu_font.render(quit_game, False, 'sky blue')
+quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
 
 #game loop runs until play_state is False
 while play_state:
