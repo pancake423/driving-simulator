@@ -32,10 +32,11 @@ score = 0
 
 #set amount of levels
 level_count = 10
+level_choice = 0
 
 #for screen width and heigth, defined and initialized here to make changing easy
-resW = 800
-resH = 600
+resW = 1080
+resH = 720
 
 #set the screen using resW and resH as arguments
 screen = pygame.display.set_mode((resW, resH))
@@ -111,11 +112,36 @@ while play_state:
                     for i in range(level_count):
                         if level_rect_list[i].collidepoint(mouse_pos):
                             level_state = False
+                            level_choice = i + 1
+                            print(level_choice)
                             screen.fill('black')
             elif event.type == pygame.QUIT:
                 title_state = False
                 level_state = False
                 play_state = False
+
+    if not level_state:
+        match level_choice:
+            case 1:
+                screen.fill((255, 255, 255))
+            case 2:
+                screen.fill((255, 255, 200))
+            case 3:
+                screen.fill((255, 200, 200))
+            case 4:
+                screen.fill((200, 200, 200))
+            case 5:
+                screen.fill((200, 200, 150))
+            case 6:
+                screen.fill((200, 150, 150))
+            case 7:
+                screen.fill((150, 150, 150))
+            case 8:
+                screen.fill((150, 150, 100))
+            case 9:
+                screen.fill((150, 100, 100))
+            case 10:
+                screen.fill((100, 100, 150))
 
     #checks the most recent event to see if the player clicked the X button
     #at the top right of the window border
