@@ -59,7 +59,7 @@ level_surf_list = []
 level_rect_list = []
 for i in range(level_count):
     level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'purple'))
-    level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 50 + (i * 50))))
+    level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 25 + (i * 55))))
 
 
 #creates a surface for rendering the title menu options ('Play' and 'Quit')
