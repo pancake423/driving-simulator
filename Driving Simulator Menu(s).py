@@ -1,9 +1,6 @@
 #import libraries from pygame extension
 import pygame
-from cars import PlayerCar
-from cars import BotCar
 from cars import PlayerCar, BotCar
-
 
 #initialize pygame
 pygame.init()
@@ -68,7 +65,7 @@ for i in range(level_count):
 play_surf = menu_font.render(play_game, False, 'sky blue')
 play_rect = play_surf.get_rect(topright = (resW - 500, resH / 3))
 quit_surf = menu_font.render(quit_game, False, 'purple')
-quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
+quit_rect = quit_surf.get_rect(topright = (resW - 350, (resH / 2) + 50))
 
 #game loop runs until play_state is False
 while play_state:
@@ -124,7 +121,14 @@ while play_state:
     if not level_state:
         match level_choice:
             case 1:
-                screen.fill((255, 255, 255))
+                screen.fill((50, 200, 50))
+                myCar.setTarget(pygame.mouse.get_pos())
+                BotCars.update()
+                player.update()
+                pygame.draw.rect(screen, "purple", myCar.getRect())
+                pygame.draw.rect(screen, "purple", playerCar.getRect())
+                BotCars.draw(screen)
+                player.draw(screen)
             case 2:
                 screen.fill((255, 255, 200))
             case 3:
