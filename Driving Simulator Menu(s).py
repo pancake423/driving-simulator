@@ -1,5 +1,8 @@
 #import libraries from pygame extension
 import pygame
+from cars import AbstractCar
+from cars import PlayerCar
+from cars import BotCar
 
 #initialize pygame
 pygame.init()
@@ -45,25 +48,25 @@ pygame.font.init()
 
 #set title menu fonts to Fixedsys regular, whose file name is '8514fix.fon'
 title_font = pygame.font.Font(menu_font_type, 50)
-menu_font = pygame.font.Font(menu_font_type, 25)
+menu_font = pygame.font.Font(menu_font_type, 50)
 
 #creates a surface for rendering the title in the pygame window
-title_surf = title_font.render(game_title, False, 'blue')
+title_surf = title_font.render(game_title, False, 'yellow')
 title_rect = title_surf.get_rect(midtop = (resW / 2, 50))
 
 #creates a surface for rendering the levels of the level select menu in the pygame window
 level_surf_list = []
 level_rect_list = []
 for i in range(level_count):
-    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'blue'))
+    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'purple'))
     level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 50 + (i * 50))))
 
 
 #creates a surface for rendering the title menu options ('Play' and 'Quit')
-play_surf = menu_font.render(play_game, False, 'blue')
-play_rect = play_surf.get_rect(topright = (resW - 50, resH / 3))
-quit_surf = menu_font.render(quit_game, False, 'blue')
-quit_rect = quit_surf.get_rect(topright = (resW - 50, (resH / 3) + 50))
+play_surf = menu_font.render(play_game, False, 'sky blue')
+play_rect = play_surf.get_rect(topright = (resW - 350, resH / 3))
+quit_surf = menu_font.render(quit_game, False, 'purple')
+quit_rect = quit_surf.get_rect(topright = (resW - 350, (resH / 2) + 50))
 
 #game loop runs until play_state is False
 while play_state:
