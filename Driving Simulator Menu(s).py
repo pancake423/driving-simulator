@@ -1,6 +1,8 @@
 #import libraries from pygame extension
 import pygame
 from cars import PlayerCar, BotCar
+#from pygame.locals import*
+#pygame.image.load(
 
 
 #initialize pygame
