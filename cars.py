@@ -12,6 +12,7 @@ class AbstractCar(pygame.sprite.Sprite):
         self.acceleration = 0.2
         self.angle = 0 #Direction the car is facing
         self.stopped = False
+        self.collideGroup = None
         
         self.setImage()
         self.mask = pygame.mask.from_surface(self.image)
@@ -58,6 +59,17 @@ class AbstractCar(pygame.sprite.Sprite):
         
     def getRect(self):
         return self.rect
+    
+    def checkCollison(self):
+        if self.collideGroup != None:
+            if len(pygame.sprite.spritecollide(self,self.collideGroup,False,pygame.sprite.collide_mask)) > 0 and not self.stopped:
+                self.stop()
+                pygame.mixer.Sound.play(self.crash_sound)
+                self.image = pygame.image.load("assets\\explosion.png")
+                self.image = pygame.transform.smoothscale(self.image, (50, 50)).convert_alpha()
+            
+    def setCollide(self, group):
+        self.collideGroup = group
         
 class PlayerCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-blue.png")
@@ -77,15 +89,8 @@ class PlayerCar(AbstractCar):
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.turn("left")
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.turn("right")
-            
-    def checkCollison(self):
-        if len(pygame.sprite.spritecollide(self,BotCars,False,pygame.sprite.collide_mask)) > 0:
-            self.stop()
-            pygame.mixer.Sound.play(self.crash_sound)
-            self.image = pygame.image.load("assets\\explosion.png")
-            self.image = pygame.transform.smoothscale(self.image, (50, 50)).convert_alpha()
-            
+            self.turn("right")        
+    
     def update(self):
         self.checkCollison()
         if self.stopped == False:
@@ -137,13 +142,6 @@ class BotCar(AbstractCar):
         
         return distance <= 20
     
-    def checkCollison(self):
-        if len(pygame.sprite.spritecollide(self,player,False,pygame.sprite.collide_mask)) > 0:
-            self.stop()
-            pygame.mixer.Sound.play(self.crash_sound)
-            self.image = pygame.image.load("assets\\explosion.png")
-            self.image = pygame.transform.smoothscale(self.image, (50, 50)).convert_alpha()
-    
     def update(self):
         self.checkCollison()
         if self.stopped == False:
@@ -163,6 +161,9 @@ if __name__ == "__main__":
     playerCar = PlayerCar()
     player.add(playerCar)
     
+    playerCar.setCollide(BotCars)
+    myCar.setCollide(player)
+    
     clock = pygame.time.Clock()
     run = True
     while run:
@@ -171,8 +172,6 @@ if __name__ == "__main__":
         myCar.setTarget(pygame.mouse.get_pos())
         BotCars.update()
         player.update()
-        pygame.draw.rect(screen, "purple", myCar.getRect())
-        pygame.draw.rect(screen, "purple", playerCar.getRect())
         BotCars.draw(screen)
         player.draw(screen)
         

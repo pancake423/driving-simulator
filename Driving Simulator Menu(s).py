@@ -1,8 +1,8 @@
 #import libraries from pygame extension
 import pygame
 #from cars import AbstractCar
-from cars import PlayerCar
-from cars import BotCar
+from cars import PlayerCar, BotCar
+
 
 #initialize pygame
 pygame.init()
@@ -65,17 +65,9 @@ for i in range(level_count):
 
 #creates a surface for rendering the title menu options ('Play' and 'Quit')
 play_surf = menu_font.render(play_game, False, 'sky blue')
-play_rect = play_surf.get_rect(topright = (resW - 350, resH / 3))
+play_rect = play_surf.get_rect(topright = (resW - 500, resH / 3))
 quit_surf = menu_font.render(quit_game, False, 'purple')
 quit_rect = quit_surf.get_rect(topright = (resW - 350, (resH / 2) + 50))
-
-BotCars = pygame.sprite.Group()
-myCar = BotCar()
-BotCars.add(myCar)
-    
-player = pygame.sprite.GroupSingle()
-playerCar = PlayerCar()
-player.add(playerCar)
 
 #game loop runs until play_state is False
 while play_state:
