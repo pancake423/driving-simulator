@@ -1,5 +1,7 @@
 #import libraries from pygame extension
 import pygame
+
+#import classes PlayerCar and BotCar from cars.py
 from cars import PlayerCar, BotCar
 
 #initialize pygame
@@ -22,8 +24,8 @@ play_state = True
 #set title_state to True to control title screen portion of game loop
 title_state = True
 
-#set level_state to True to control level select screen portion of game loop
-level_state = True
+#set level_state to False to control level select screen portion of game loop
+level_state = False
 
 #define and initialize score
 score = 0
@@ -87,41 +89,38 @@ myCar.setCollide(player)
 
 #game loop runs until play_state is False
 while play_state:
-    
-    #if title_state True, shows the title menu
-    if title_state == True:
-        screen.blit(title_surf, title_rect)
-        screen.blit(play_surf, play_rect)
-        screen.blit(quit_surf, quit_rect)
 
-        #get mouse position to check if mouse is over Play or Quit
-        mouse_pos = pygame.mouse.get_pos()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            title_state = False
+            level_state = False
+            play_state = False
+            pygame.quit()
+            exit()
+        
+        if title_state:
 
-        #checks if mouse is positioned over Play or Quit and if leck click is pressed
-        for event in pygame.event.get():
+            #get mouse position to check if mouse is over Play or Quit
+            mouse_pos = pygame.mouse.get_pos()
+
+            #checks if mouse is positioned over Play or Quit and if leck click is pressed
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_state = pygame.mouse.get_pressed()
                 if mouse_state[0]:
                     if play_rect.collidepoint(mouse_pos):
                         title_state = False
+                        level_state = True
                         screen.fill('black')
                     elif quit_rect.collidepoint(mouse_pos):
                         title_state = False
                         play_state = False
-            elif event.type == pygame.QUIT:
-                title_state = False
-                level_state = False
-                play_state = False
+        
+        if level_state:
 
-    if title_state == False and level_state == True:
-        for i in range(level_count):
-            screen.blit(level_surf_list[i], level_rect_list[i])
+            #get mouse position to check if mouse is over any of the levels
+            mouse_pos = pygame.mouse.get_pos()
 
-        #get mouse position to check if mouse is over any of the levels
-        mouse_pos = pygame.mouse.get_pos()
-
-        #checks if mouse is positioned over a level and if leck click is pressed
-        for event in pygame.event.get():
+            #checks if mouse is positioned over a level and if leck click is pressed
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_state = pygame.mouse.get_pressed()
                 if mouse_state[0]:
@@ -131,10 +130,17 @@ while play_state:
                             level_choice = i + 1
                             print(level_choice)
                             screen.fill('black')
-            elif event.type == pygame.QUIT:
-                title_state = False
-                level_state = False
-                play_state = False
+
+    
+    #if title_state True, shows the title menu
+    if title_state:
+        screen.blit(title_surf, title_rect)
+        screen.blit(play_surf, play_rect)
+        screen.blit(quit_surf, quit_rect)
+
+    if level_state:
+        for i in range(level_count):
+            screen.blit(level_surf_list[i], level_rect_list[i])
 
     if not level_state:
         match level_choice:
@@ -163,14 +169,6 @@ while play_state:
                 screen.fill((150, 100, 100))
             case 10:
                 screen.fill((100, 100, 150))
-
-    #checks the most recent event to see if the player clicked the X button
-    #at the top right of the window border
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            title_state = False
-            level_state = False
-            play_state = False
 
     #update screen with a background
     pygame.display.update()
