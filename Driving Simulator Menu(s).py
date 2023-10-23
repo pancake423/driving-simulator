@@ -18,14 +18,14 @@ quit_game = "Quit"
 #define and set font type(s)
 menu_font_type = 'fonts/Get Now.ttf'
 
-#set play_state to True to control game loop
-play_state = True
-
 #set title_state to True to control title screen portion of game loop
 title_state = True
 
 #set level_state to False to control level select screen portion of game loop
 level_state = False
+
+#set play_state to False to control gameplay portion of game loop
+play_state = False
 
 #define and initialize score
 score = 0
@@ -40,10 +40,10 @@ resH = 720
 
 #set the screen using resW and resH as arguments
 screen = pygame.display.set_mode((resW, resH))
+
+#set background image for title menu
 background = pygame.image.load('assets/standard-road.png').convert()
 background = pygame.transform.smoothscale(background,(resW,resH))
-screen.blit(background, (0,0))
-pygame.display.flip()
 
 #initailize clock for the game
 clock = pygame.time.Clock()
@@ -88,8 +88,9 @@ playerCar.setCollide(BotCars)
 myCar.setCollide(player)
 
 #game loop runs until play_state is False
-while play_state:
+while True:
 
+    #event loop checks for all possible events in the game
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             title_state = False
@@ -99,7 +100,6 @@ while play_state:
             exit()
         
         if title_state:
-
             #get mouse position to check if mouse is over Play or Quit
             mouse_pos = pygame.mouse.get_pos()
 
@@ -114,7 +114,8 @@ while play_state:
                     elif quit_rect.collidepoint(mouse_pos):
                         title_state = False
                         play_state = False
-        
+                        pygame.quit()
+                        exit()
         if level_state:
 
             #get mouse position to check if mouse is over any of the levels
@@ -127,13 +128,15 @@ while play_state:
                     for i in range(level_count):
                         if level_rect_list[i].collidepoint(mouse_pos):
                             level_state = False
+                            play_state = True
                             level_choice = i + 1
-                            print(level_choice)
+                            #print(level_choice)
                             screen.fill('black')
 
     
     #if title_state True, shows the title menu
     if title_state:
+        screen.blit(background, (0,0))
         screen.blit(title_surf, title_rect)
         screen.blit(play_surf, play_rect)
         screen.blit(quit_surf, quit_rect)
@@ -142,15 +145,11 @@ while play_state:
         for i in range(level_count):
             screen.blit(level_surf_list[i], level_rect_list[i])
 
-    if not level_state:
+    if play_state:
         match level_choice:
             case 1:
                 screen.fill((50, 200, 50))
                 myCar.setTarget(pygame.mouse.get_pos())
-                BotCars.update()
-                player.update()
-                BotCars.draw(screen)
-                player.draw(screen)
             case 2:
                 screen.fill((255, 255, 200))
             case 3:
@@ -170,8 +169,13 @@ while play_state:
             case 10:
                 screen.fill((100, 100, 150))
 
+        BotCars.update()
+        player.update()            
+        BotCars.draw(screen)
+        player.draw(screen)
+
     #update screen with a background
-    pygame.display.update()
+    pygame.display.flip()
     clock.tick(60)
 
 pygame.quit()
