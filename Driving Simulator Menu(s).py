@@ -61,8 +61,8 @@ resCH = 280
 screen = pygame.display.set_mode((resW, resH))
 
 #set background image for title menu
-background = pygame.image.load('assets/standard-road.png').convert()
-background = pygame.transform.smoothscale(background,(resW,resH))
+background = pygame.image.load('assets/standard-road.png')
+background = pygame.transform.smoothscale(background,(resW,resH)).convert_alpha()
 
 #car background image for title menu
 carBackground = pygame.image.load('assets/unicorn-car-blue.png')
@@ -71,7 +71,8 @@ carBackground = pygame.transform.smoothscale(carBackground,(resCW,resCH)).conver
 #AI car background image for title menu
 AIcarBackground = pygame.image.load('assets/unicorn-car-red.png')
 AICar = pygame.transform.smoothscale(AIcarBackground,(resCW,resCH)).convert_alpha()
-redCar = pygame.transform.flip(AICar, False, True).convert_alpha()
+redCar = pygame.transform.flip(AICar, False, True)
+
 #set menu font to 'Get Now.ttf'
 menu_font = pygame.font.Font(font_type, 50)
 
