@@ -54,8 +54,7 @@ level_choice = 0
 #for screen width and heigth, defined and initialized here to make changing easy
 resW = 1080
 resH = 720
-resCW = 480
-resCH = 280
+resCH = 320
 
 #set the screen using resW and resH as arguments
 screen = pygame.display.set_mode((resW, resH))
@@ -66,11 +65,12 @@ background = pygame.transform.smoothscale(background,(resW,resH)).convert_alpha(
 
 #car background image for title menu
 carBackground = pygame.image.load('assets/unicorn-car-blue.png')
-carBackground = pygame.transform.smoothscale(carBackground,(resCW,resCH)).convert_alpha()
+ratio = carBackground.get_width()/carBackground.get_height()
+carBackground = pygame.transform.smoothscale(carBackground,(resCH*ratio,resCH)).convert_alpha()
 
 #AI car background image for title menu
 AIcarBackground = pygame.image.load('assets/unicorn-car-red.png')
-AICar = pygame.transform.smoothscale(AIcarBackground,(resCW,resCH)).convert_alpha()
+AICar = pygame.transform.smoothscale(AIcarBackground,(resCH*ratio,resCH)).convert_alpha()
 redCar = pygame.transform.flip(AICar, False, True)
 
 #set menu font to 'Get Now.ttf'
@@ -173,8 +173,8 @@ while True:
     #if title_state True, shows the title menu
     if title_state:
         screen.blit(background, (0,0))
-        screen.blit(carBackground, (40,400))
-        screen.blit(redCar, (560,100))
+        screen.blit(carBackground, (200,400))
+        screen.blit(redCar, (700,100))
         screen.blit(title_surf, title_rect)
         screen.blit(play_surf, play_rect)
         screen.blit(quit_surf, quit_rect)
