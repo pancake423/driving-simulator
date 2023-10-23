@@ -15,14 +15,14 @@ quit_game = "Quit"
 #define and set font type(s)
 menu_font_type = 'fonts/Get Now.ttf'
 
-#set play_state to True to control game loop
-play_state = True
-
 #set title_state to True to control title screen portion of game loop
 title_state = True
 
 #set level_state to True to control level select screen portion of game loop
 level_state = True
+
+#set play_state to False to control gameplay portion of game loop
+play_state = False
 
 #define and initialize score
 score = 0
@@ -37,6 +37,13 @@ resH = 720
 
 #set the screen using resW and resH as arguments
 screen = pygame.display.set_mode((resW, resH))
+<<<<<<< Updated upstream
+=======
+
+#set background image for title menu
+background = pygame.image.load('assets/standard-road.png').convert()
+background = pygame.transform.smoothscale(background,(resW,resH))
+>>>>>>> Stashed changes
 
 #initailize clock for the game
 clock = pygame.time.Clock()
@@ -67,6 +74,7 @@ quit_surf = menu_font.render(quit_game, False, 'blue')
 quit_rect = quit_surf.get_rect(topright = (resW - 50, (resH / 3) + 50))
 
 #game loop runs until play_state is False
+<<<<<<< Updated upstream
 while play_state:
     
     #if title_state True, shows the title menu
@@ -77,6 +85,21 @@ while play_state:
 
         #get mouse position to check if mouse is over Play or Quit
         mouse_pos = pygame.mouse.get_pos()
+=======
+while True:
+
+    #event loop checks for all possible events in the game
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            title_state = False
+            level_state = False
+            play_state = False
+            pygame.quit()
+            exit()
+        
+        if title_state:
+            screen.blit(background, (0,0))
+>>>>>>> Stashed changes
 
         #checks if mouse is positioned over Play or Quit and if leck click is pressed
         for event in pygame.event.get():
@@ -87,12 +110,19 @@ while play_state:
                         title_state = False
                         screen.fill('black')
                     elif quit_rect.collidepoint(mouse_pos):
+<<<<<<< Updated upstream
                         title_state = False
                         play_state = False
             elif event.type == pygame.QUIT:
                 title_state = False
                 level_state = False
                 play_state = False
+=======
+                        pygame.quit()
+                        exit()
+        
+        if level_state:
+>>>>>>> Stashed changes
 
     if title_state == False and level_state == True:
         for i in range(level_count):
@@ -109,18 +139,24 @@ while play_state:
                     for i in range(level_count):
                         if level_rect_list[i].collidepoint(mouse_pos):
                             level_state = False
+                            play_state = True
                             level_choice = i + 1
-                            print(level_choice)
+                            #print(level_choice)
                             screen.fill('black')
             elif event.type == pygame.QUIT:
                 title_state = False
                 level_state = False
                 play_state = False
 
-    if not level_state:
+    if play_state:
         match level_choice:
             case 1:
+<<<<<<< Updated upstream
                 screen.fill((255, 255, 255))
+=======
+                screen.fill((50, 200, 50))
+                myCar.setTarget(pygame.mouse.get_pos())
+>>>>>>> Stashed changes
             case 2:
                 screen.fill((255, 255, 200))
             case 3:
@@ -140,6 +176,7 @@ while play_state:
             case 10:
                 screen.fill((100, 100, 150))
 
+<<<<<<< Updated upstream
     #checks the most recent event to see if the player clicked the X button
     #at the top right of the window border
     for event in pygame.event.get():
@@ -147,9 +184,16 @@ while play_state:
             title_state = False
             level_state = False
             play_state = False
+=======
+
+        BotCars.update()
+        player.update()            
+        BotCars.draw(screen)
+        player.draw(screen)
+>>>>>>> Stashed changes
 
     #update screen with a background
-    pygame.display.update()
+    pygame.display.flip()
     clock.tick(60)
 
 pygame.quit()
