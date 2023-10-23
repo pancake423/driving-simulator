@@ -71,6 +71,9 @@ class AbstractCar(pygame.sprite.Sprite):
     def setCollide(self, group):
         self.collideGroup = group
         
+    def isStopped(self):
+        return self.stopped
+        
 class PlayerCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-blue.png")
     START = (1000,400)
