@@ -54,6 +54,8 @@ level_choice = 0
 #for screen width and heigth, defined and initialized here to make changing easy
 resW = 1080
 resH = 720
+resCW = 480
+resCH = 280
 
 #set the screen using resW and resH as arguments
 screen = pygame.display.set_mode((resW, resH))
@@ -62,6 +64,14 @@ screen = pygame.display.set_mode((resW, resH))
 background = pygame.image.load('assets/standard-road.png').convert()
 background = pygame.transform.smoothscale(background,(resW,resH))
 
+#car background image for title menu
+carBackground = pygame.image.load('assets/unicorn-car-blue.png')
+carBackground = pygame.transform.smoothscale(carBackground,(resCW,resCH)).convert_alpha()
+
+#AI car background image for title menu
+AIcarBackground = pygame.image.load('assets/unicorn-car-red.png')
+AICar = pygame.transform.smoothscale(AIcarBackground,(resCW,resCH)).convert_alpha()
+redCar = pygame.transform.flip(AICar, False, True).convert_alpha()
 #set menu font to 'Get Now.ttf'
 menu_font = pygame.font.Font(font_type, 50)
 
@@ -75,15 +85,15 @@ play_rect = play_surf.get_rect(topright = (resW - 500, resH / 3))
 quit_surf = menu_font.render(quit_game, False, 'sky blue')
 quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
 
-quit_surf = menu_font.render(quit_game, False, 'purple')
+quit_surf = menu_font.render(quit_game, False, 'sky blue')
 quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
 
 #creates a surface for rendering the levels of the level select menu in the pygame window
 level_surf_list = []
 level_rect_list = []
 for i in range(level_count):
-    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'purple'))
-    level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 25 + (i * 55))))
+    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'lawn green'))
+    level_rect_list.append(level_surf_list[i].get_rect(topleft = (65, 25 + (i * 55))))
 
 #creates a surface for the game over screen
 fail_surf = menu_font.render(game_fail, False, 'red')
@@ -162,11 +172,16 @@ while True:
     #if title_state True, shows the title menu
     if title_state:
         screen.blit(background, (0,0))
+        screen.blit(carBackground, (40,400))
+        screen.blit(redCar, (560,100))
         screen.blit(title_surf, title_rect)
         screen.blit(play_surf, play_rect)
         screen.blit(quit_surf, quit_rect)
 
     if level_state:
+        screen.blit(background, (0,0))
+        screen.blit(carBackground, (40,400))
+        screen.blit(redCar, (560,100))
         for i in range(level_count):
             screen.blit(level_surf_list[i], level_rect_list[i])
 
