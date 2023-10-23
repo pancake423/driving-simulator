@@ -1,6 +1,9 @@
 #import libraries from pygame extension
 import pygame
 
+#import classes PlayerCar and BotCar from cars.py
+from cars import PlayerCar, BotCar
+
 #initialize pygame
 pygame.init()
 
@@ -18,8 +21,8 @@ menu_font_type = 'fonts/Get Now.ttf'
 #set title_state to True to control title screen portion of game loop
 title_state = True
 
-#set level_state to True to control level select screen portion of game loop
-level_state = True
+#set level_state to False to control level select screen portion of game loop
+level_state = False
 
 #set play_state to False to control gameplay portion of game loop
 play_state = False
@@ -37,13 +40,10 @@ resH = 720
 
 #set the screen using resW and resH as arguments
 screen = pygame.display.set_mode((resW, resH))
-<<<<<<< Updated upstream
-=======
 
 #set background image for title menu
 background = pygame.image.load('assets/standard-road.png').convert()
 background = pygame.transform.smoothscale(background,(resW,resH))
->>>>>>> Stashed changes
 
 #initailize clock for the game
 clock = pygame.time.Clock()
@@ -53,39 +53,41 @@ pygame.font.init()
 
 #set title menu fonts to Fixedsys regular, whose file name is '8514fix.fon'
 title_font = pygame.font.Font(menu_font_type, 50)
-menu_font = pygame.font.Font(menu_font_type, 25)
+menu_font = pygame.font.Font(menu_font_type, 50)
 
 #creates a surface for rendering the title in the pygame window
-title_surf = title_font.render(game_title, False, 'blue')
+title_surf = title_font.render(game_title, False, 'yellow')
 title_rect = title_surf.get_rect(midtop = (resW / 2, 50))
 
 #creates a surface for rendering the levels of the level select menu in the pygame window
 level_surf_list = []
 level_rect_list = []
 for i in range(level_count):
-    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'blue'))
-    level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 50 + (i * 50))))
+    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'purple'))
+    level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 25 + (i * 55))))
 
 
 #creates a surface for rendering the title menu options ('Play' and 'Quit')
-play_surf = menu_font.render(play_game, False, 'blue')
-play_rect = play_surf.get_rect(topright = (resW - 50, resH / 3))
-quit_surf = menu_font.render(quit_game, False, 'blue')
-quit_rect = quit_surf.get_rect(topright = (resW - 50, (resH / 3) + 50))
+play_surf = menu_font.render(play_game, False, 'sky blue')
+play_rect = play_surf.get_rect(topright = (resW - 500, resH / 3))
+quit_surf = menu_font.render(quit_game, False, 'sky blue')
+quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
+
+quit_surf = menu_font.render(quit_game, False, 'purple')
+quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
+
+BotCars = pygame.sprite.Group()
+myCar = BotCar()
+BotCars.add(myCar)
+    
+player = pygame.sprite.GroupSingle()
+playerCar = PlayerCar()
+player.add(playerCar)
+    
+playerCar.setCollide(BotCars)
+myCar.setCollide(player)
 
 #game loop runs until play_state is False
-<<<<<<< Updated upstream
-while play_state:
-    
-    #if title_state True, shows the title menu
-    if title_state == True:
-        screen.blit(title_surf, title_rect)
-        screen.blit(play_surf, play_rect)
-        screen.blit(quit_surf, quit_rect)
-
-        #get mouse position to check if mouse is over Play or Quit
-        mouse_pos = pygame.mouse.get_pos()
-=======
 while True:
 
     #event loop checks for all possible events in the game
@@ -98,41 +100,28 @@ while True:
             exit()
         
         if title_state:
-            screen.blit(background, (0,0))
->>>>>>> Stashed changes
+            #get mouse position to check if mouse is over Play or Quit
+            mouse_pos = pygame.mouse.get_pos()
 
-        #checks if mouse is positioned over Play or Quit and if leck click is pressed
-        for event in pygame.event.get():
+            #checks if mouse is positioned over Play or Quit and if leck click is pressed
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_state = pygame.mouse.get_pressed()
                 if mouse_state[0]:
                     if play_rect.collidepoint(mouse_pos):
                         title_state = False
+                        level_state = True
                         screen.fill('black')
                     elif quit_rect.collidepoint(mouse_pos):
-<<<<<<< Updated upstream
                         title_state = False
                         play_state = False
-            elif event.type == pygame.QUIT:
-                title_state = False
-                level_state = False
-                play_state = False
-=======
                         pygame.quit()
                         exit()
-        
         if level_state:
->>>>>>> Stashed changes
 
-    if title_state == False and level_state == True:
-        for i in range(level_count):
-            screen.blit(level_surf_list[i], level_rect_list[i])
+            #get mouse position to check if mouse is over any of the levels
+            mouse_pos = pygame.mouse.get_pos()
 
-        #get mouse position to check if mouse is over any of the levels
-        mouse_pos = pygame.mouse.get_pos()
-
-        #checks if mouse is positioned over a level and if leck click is pressed
-        for event in pygame.event.get():
+            #checks if mouse is positioned over a level and if leck click is pressed
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_state = pygame.mouse.get_pressed()
                 if mouse_state[0]:
@@ -143,20 +132,24 @@ while True:
                             level_choice = i + 1
                             #print(level_choice)
                             screen.fill('black')
-            elif event.type == pygame.QUIT:
-                title_state = False
-                level_state = False
-                play_state = False
+
+    
+    #if title_state True, shows the title menu
+    if title_state:
+        screen.blit(background, (0,0))
+        screen.blit(title_surf, title_rect)
+        screen.blit(play_surf, play_rect)
+        screen.blit(quit_surf, quit_rect)
+
+    if level_state:
+        for i in range(level_count):
+            screen.blit(level_surf_list[i], level_rect_list[i])
 
     if play_state:
         match level_choice:
             case 1:
-<<<<<<< Updated upstream
-                screen.fill((255, 255, 255))
-=======
                 screen.fill((50, 200, 50))
                 myCar.setTarget(pygame.mouse.get_pos())
->>>>>>> Stashed changes
             case 2:
                 screen.fill((255, 255, 200))
             case 3:
@@ -176,21 +169,10 @@ while True:
             case 10:
                 screen.fill((100, 100, 150))
 
-<<<<<<< Updated upstream
-    #checks the most recent event to see if the player clicked the X button
-    #at the top right of the window border
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            title_state = False
-            level_state = False
-            play_state = False
-=======
-
         BotCars.update()
         player.update()            
         BotCars.draw(screen)
         player.draw(screen)
->>>>>>> Stashed changes
 
     #update screen with a background
     pygame.display.flip()
