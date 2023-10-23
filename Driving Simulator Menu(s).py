@@ -4,8 +4,22 @@ import pygame
 #import classes PlayerCar and BotCar from cars.py
 from cars import PlayerCar, BotCar
 
+def display_score():
+    current_time = str((pygame.time.get_ticks() - start_time) / 1000)
+    score_surf = menu_font.render(current_time, False, (221, 73, 73))
+    score_rect = score_surf.get_rect(topleft = (25, 25))
+    screen.blit(score_surf, score_rect)
+
 #initialize pygame
 pygame.init()
+
+#initailize clock for the game
+clock = pygame.time.Clock()
+
+#initialize pygame fonts
+pygame.font.init()
+
+start_time = 0
 
 #define and set title of pygame that will display on the window border
 game_title = "2-D Driving Simulator"
@@ -15,8 +29,11 @@ pygame.display.set_caption(game_title)
 play_game = "Play"
 quit_game = "Quit"
 
+#define game over
+game_fail = "Game Over"
+
 #define and set font type(s)
-menu_font_type = 'fonts/Get Now.ttf'
+font_type = 'fonts/Get Now.ttf'
 
 #set title_state to True to control title screen portion of game loop
 title_state = True
@@ -27,8 +44,8 @@ level_state = False
 #set play_state to False to control gameplay portion of game loop
 play_state = False
 
-#define and initialize score
-score = 0
+#set end_state to False to control level end screen portion of game loop
+end_state = False
 
 #set amount of levels
 level_count = 10
@@ -45,27 +62,12 @@ screen = pygame.display.set_mode((resW, resH))
 background = pygame.image.load('assets/standard-road.png').convert()
 background = pygame.transform.smoothscale(background,(resW,resH))
 
-#initailize clock for the game
-clock = pygame.time.Clock()
-
-#initialize pygame fonts
-pygame.font.init()
-
-#set title menu fonts to Fixedsys regular, whose file name is '8514fix.fon'
-title_font = pygame.font.Font(menu_font_type, 50)
-menu_font = pygame.font.Font(menu_font_type, 50)
+#set menu font to 'Get Now.ttf'
+menu_font = pygame.font.Font(font_type, 50)
 
 #creates a surface for rendering the title in the pygame window
-title_surf = title_font.render(game_title, False, 'yellow')
+title_surf = menu_font.render(game_title, False, 'yellow')
 title_rect = title_surf.get_rect(midtop = (resW / 2, 50))
-
-#creates a surface for rendering the levels of the level select menu in the pygame window
-level_surf_list = []
-level_rect_list = []
-for i in range(level_count):
-    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'purple'))
-    level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 25 + (i * 55))))
-
 
 #creates a surface for rendering the title menu options ('Play' and 'Quit')
 play_surf = menu_font.render(play_game, False, 'sky blue')
@@ -75,6 +77,17 @@ quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
 
 quit_surf = menu_font.render(quit_game, False, 'purple')
 quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
+
+#creates a surface for rendering the levels of the level select menu in the pygame window
+level_surf_list = []
+level_rect_list = []
+for i in range(level_count):
+    level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'purple'))
+    level_rect_list.append(level_surf_list[i].get_rect(topleft = (50, 25 + (i * 55))))
+
+#creates a surface for the game over screen
+fail_surf = menu_font.render(game_fail, False, 'red')
+fail_rect = fail_surf.get_rect(midtop = (resW / 2, 25))
 
 BotCars = pygame.sprite.Group()
 myCar = BotCar()
@@ -87,7 +100,7 @@ player.add(playerCar)
 playerCar.setCollide(BotCars)
 myCar.setCollide(player)
 
-#game loop runs until play_state is False
+#game loop runs unitl a quit condition is met
 while True:
 
     #event loop checks for all possible events in the game
@@ -133,6 +146,18 @@ while True:
                             #print(level_choice)
                             screen.fill('black')
 
+        if end_state:
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                play_state = True
+                end_state = False
+                playerCar.setImage()
+                myCar.setImage()
+                start_time = pygame.time.get_ticks()
+
+
+
+
     
     #if title_state True, shows the title menu
     if title_state:
@@ -151,28 +176,36 @@ while True:
                 screen.fill((50, 200, 50))
                 myCar.setTarget(pygame.mouse.get_pos())
             case 2:
-                screen.fill((255, 255, 200))
+                screen.fill((255, 200, 100))
             case 3:
-                screen.fill((255, 200, 200))
+                screen.fill((100, 200, 255))
             case 4:
-                screen.fill((200, 200, 200))
+                screen.fill((200, 100, 255))
             case 5:
-                screen.fill((200, 200, 150))
+                screen.fill((255, 100, 200))
             case 6:
-                screen.fill((200, 150, 150))
+                screen.fill((200, 255, 100))
             case 7:
-                screen.fill((150, 150, 150))
+                screen.fill((100, 255, 200))
             case 8:
-                screen.fill((150, 150, 100))
+                screen.fill((200, 100, 100))
             case 9:
-                screen.fill((150, 100, 100))
+                screen.fill((100, 200, 100))
             case 10:
-                screen.fill((100, 100, 150))
+                screen.fill((100, 100, 200))
 
-        BotCars.update()
-        player.update()            
+        display_score()
+        player.update() 
+        BotCars.update()           
         BotCars.draw(screen)
         player.draw(screen)
+        
+        if playerCar.isStopped():
+            play_state = False
+            end_state = True
+
+    if end_state:
+        screen.blit(fail_surf, fail_rect)
 
     #update screen with a background
     pygame.display.flip()
