@@ -204,8 +204,8 @@ while True:
 
     if level_state:
         screen.blit(background, (0,0))
-        screen.blit(carBackground, (40,400))
-        screen.blit(redCar, (560,100))
+        screen.blit(carBackground, (200,400))
+        screen.blit(redCar, (700,100))
         for i in range(level_count):
             screen.blit(level_surf_list[i], level_rect_list[i])
             if level_rect_list[i].collidepoint(mouse_pos):
