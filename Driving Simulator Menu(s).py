@@ -5,7 +5,10 @@ import pygame
 from cars import PlayerCar, BotCar
 
 #import classes Level, RectSprite, ImageSprite, & RoadLane
-from levels import Level, RectSprite, ImageSprite, RoadLane
+from levels import Level, RectSprite, ImageSprite, RoadLane, Level
+
+#import level_One class
+from Level1 import level_One
 
 def display_score():
     current_time = "Score: " + str((pygame.time.get_ticks() - start_time) / 1000)
