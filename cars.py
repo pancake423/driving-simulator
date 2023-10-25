@@ -71,24 +71,32 @@ class AbstractCar(pygame.sprite.Sprite):
     def setCollide(self, group):
         self.collideGroup = group
         
-    def isStopped(self):
-        return self.stopped
-        
 class PlayerCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-blue.png")
-    START = (1000,400)
+    y_flipped = False
+    #START = (1000,400)
     
-    def __init__(self):
+    def __init__(self, y_flip_img = False, x_axis = 1000, y_axis = 400):
+        if y_flip_img:
+            self.y_flipped = y_flip_img
+            self.IMG = pygame.transform.flip(self.IMG, False, y_flip_img)
+        self.START = (x_axis, y_axis)
         super().__init__()
         self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
         self.crash_sound.set_volume(0.3)
-        
+            
     def player_input(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.accelerate()
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.decelerate()
+        if self.y_flipped:    
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                self.decelerate()
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                self.accelerate()
+        else:
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                self.accelerate()
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                self.decelerate()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.turn("left")
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
@@ -99,12 +107,19 @@ class PlayerCar(AbstractCar):
         if self.stopped == False:
             self.player_input()
             self.move()
+        
+    def isStopped(self):
+        return self.stopped
+    
+    def getSpeed(self):
+        return self.velocity
             
 class BotCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-red.png")
-    START = (100, 100)
+    #START = (100, 100)
     
-    def __init__(self):
+    def __init__(self, flip_img = False, x_axis = 100, y_axis = 100):
+        self.START = (x_axis, y_axis)
         super().__init__()
         self.target = (self.rect.center)
         self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
