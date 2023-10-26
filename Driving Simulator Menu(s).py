@@ -4,8 +4,14 @@ import pygame
 #import classes PlayerCar and BotCar from cars.py
 from cars import PlayerCar, BotCar
 
+#import classes Level, RectSprite, ImageSprite, & RoadLane
+from levels import Level, RectSprite, ImageSprite, RoadLane, Level
+
+#import level_One class
+from Level1 import level_One
+
 def display_score():
-    current_time = str((pygame.time.get_ticks() - start_time) / 1000)
+    current_time = "Score: " + str((pygame.time.get_ticks() - start_time) / 1000)
     score_surf = menu_font.render(current_time, False, (221, 73, 73))
     score_rect = score_surf.get_rect(topleft = (25, 25))
     screen.blit(score_surf, score_rect)
@@ -31,6 +37,9 @@ quit_game = "Quit"
 
 #define game over
 game_fail = "Game Over"
+
+#define restart message
+ask_retry = "Press 'spacebar' to retry the level"
 
 #define and set font type(s)
 font_type = 'fonts/Get Now.ttf'
@@ -92,20 +101,23 @@ quit_rect = quit_surf.get_rect(topright = (resW - 500, (resH / 2) + 50))
 #creates a surface for rendering the levels of the level select menu in the pygame window
 level_surf_list = []
 level_rect_list = []
+level_list = [None for i in range(level_count)]
 for i in range(level_count):
     level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'lawn green'))
-    level_rect_list.append(level_surf_list[i].get_rect(topleft = (65, 25 + (i * 55))))
+    level_rect_list.append(level_surf_list[i].get_rect(topleft = (65, 30 + (i * 65))))
 
-#creates a surface for the game over screen
+#creates surfaces for the game over screen and retry message
 fail_surf = menu_font.render(game_fail, False, 'red')
 fail_rect = fail_surf.get_rect(midtop = (resW / 2, 25))
+retry_surf = menu_font.render(ask_retry, False, 'red')
+retry_rect = retry_surf.get_rect(midtop = (resW / 2, 100))
 
 BotCars = pygame.sprite.Group()
-myCar = BotCar()
+myCar = BotCar((200, 200))
 BotCars.add(myCar)
     
 player = pygame.sprite.GroupSingle()
-playerCar = PlayerCar()
+playerCar = PlayerCar((600, 600))
 player.add(playerCar)
     
 playerCar.setCollide(BotCars)
@@ -140,6 +152,7 @@ while True:
                         play_state = False
                         pygame.quit()
                         exit()
+
         if level_state:
 
             #get mouse position to check if mouse is over any of the levels
@@ -153,6 +166,7 @@ while True:
                         if level_rect_list[i].collidepoint(mouse_pos):
                             level_state = False
                             play_state = True
+                            start_time = pygame.time.get_ticks()
                             level_choice = i + 1
                             #print(level_choice)
                             screen.fill('black')
@@ -162,14 +176,22 @@ while True:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 play_state = True
                 end_state = False
-                playerCar.setImage()
-                myCar.setImage()
+                player.remove(playerCar)
+                playerCar = PlayerCar((600, 600))
+                player.add(playerCar)
+                #playerCar.setImage()
+                BotCars.remove(myCar)
+                myCar = BotCar((200, 200))
+                BotCars.add(myCar)
+                playerCar.setCollide(BotCars)
+                myCar.setCollide(player)
+                #myCar.setImage()
                 start_time = pygame.time.get_ticks()
 
 
 
 
-    
+    #game loop primarily responsible for display
     #if title_state True, shows the title menu
     if title_state:
         screen.blit(background, (0,0))
@@ -178,6 +200,10 @@ while True:
         screen.blit(title_surf, title_rect)
         screen.blit(play_surf, play_rect)
         screen.blit(quit_surf, quit_rect)
+        if play_rect.collidepoint(mouse_pos):
+            pygame.draw.rect(screen, 'lawngreen', play_rect, 5)
+        elif quit_rect.collidepoint(mouse_pos):
+            pygame.draw.rect(screen, 'lawngreen', quit_rect, 5)
 
     if level_state:
         screen.blit(background, (0,0))
@@ -185,10 +211,20 @@ while True:
         screen.blit(redCar, (700,100))
         for i in range(level_count):
             screen.blit(level_surf_list[i], level_rect_list[i])
+            if level_rect_list[i].collidepoint(mouse_pos):
+                pygame.draw.rect(screen, 'lawngreen', level_rect_list[i], 5)
 
     if play_state:
         match level_choice:
             case 1:
+                if level_list[level_choice - 1] == None:
+                    level_list[level_choice - 1] = Level(resW, resH)
+                    level_list[level_choice - 1].add_intersection(540, 360)
+                    level_list[level_choice - 1].add_vertical_road(540, 465, 720)
+                    level_list[level_choice - 1].add_vertical_road(540, 0, 255)
+                    level_list[level_choice - 1].add_horizontal_road(0, 435, 360)
+                    level_list[level_choice - 1].add_horizontal_road(645, 1080, 360)
+
                 screen.fill((50, 200, 50))
                 myCar.setTarget(pygame.mouse.get_pos())
             case 2:
@@ -210,18 +246,20 @@ while True:
             case 10:
                 screen.fill((100, 100, 200))
 
-        display_score()
         player.update() 
-        BotCars.update()           
+        BotCars.update()
+        level_list[level_choice - 1].draw(screen, 0, 0)           
         BotCars.draw(screen)
         player.draw(screen)
-        
+        display_score()
+
         if playerCar.isStopped():
             play_state = False
             end_state = True
 
     if end_state:
         screen.blit(fail_surf, fail_rect)
+        screen.blit(retry_surf, retry_rect)
 
     #update screen with a background
     pygame.display.flip()
