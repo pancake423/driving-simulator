@@ -101,8 +101,8 @@ class AbstractCar(pygame.sprite.Sprite):
 class PlayerCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-blue.png")
     
-    def __init__(self, START):
-        super().__init__(START)
+    def __init__(self, startPos, angle = 0):
+        super().__init__(startPos, angle)
         self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
         self.crash_sound.set_volume(0.3)
         
@@ -126,8 +126,8 @@ class PlayerCar(AbstractCar):
 class BotCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-red.png")
     
-    def __init__(self, START):
-        super().__init__(START)
+    def __init__(self, startPos, angle = 0):
+        super().__init__(startPos, angle)
         self.target = (self.rect.center)
         self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
         self.crash_sound.set_volume(0.3)
