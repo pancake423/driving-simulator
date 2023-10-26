@@ -2,7 +2,7 @@ import pygame
 import math
 
 class AbstractCar(pygame.sprite.Sprite):
-    def __init__(self, start, startAngle = 0):
+    def __init__(self, startPos, startAngle = 0):
         super().__init__()
         
         self.length = 100
@@ -18,7 +18,7 @@ class AbstractCar(pygame.sprite.Sprite):
         
         self.setImage()
         self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=(start))
+        self.rect = self.image.get_rect(center=(startPos))
         
     def setImage(self):
         ratio = self.IMG.get_width() / self.IMG.get_height()
