@@ -223,7 +223,7 @@ while True:
                         title_state = True
                         player.remove(playerCar)
                         BotCars.remove(myCar)
-                        playerCar, myCar = refresh_cars(PlayerCar(True, resW - 50, 325), BotCar(x_axis = 50, y_axis = 325))
+                        playerCar, myCar = refresh_cars(PlayerCar((resW - 50, 325)), BotCar((50, 325)))
                         paused_time = 0
 
                     if quit_desktop_rect.collidepoint(mouse_pos):
@@ -240,7 +240,7 @@ while True:
                 paused_time = 0
                 player.remove(playerCar)
                 BotCars.remove(myCar)
-                playerCar, myCar = refresh_cars(PlayerCar(True, resW - 50, 400), BotCar(x_axis = 50, y_axis = 325))
+                playerCar, myCar = refresh_cars(PlayerCar((resW - 50, 400)), BotCar((50, 325)))
                 start_time = pygame.time.get_ticks()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
@@ -249,7 +249,7 @@ while True:
                 paused_time = 0
                 player.remove(playerCar)
                 BotCars.remove(myCar)
-                playerCar, myCar = refresh_cars(PlayerCar(True, resW - 50, 400), BotCar(x_axis = 50, y_axis = 325))
+                playerCar, myCar = refresh_cars(PlayerCar((resW - 50, 400)), BotCar((50, 325)))
 
     #----end event loop----
 
@@ -285,9 +285,8 @@ while True:
             case 1:
                 if level_list[level_choice - 1] == None:
                     x_flip = True
-                    start_pos = (resW - 50, 400)
-                    playerCar = PlayerCar(start_pos, 180)
-                    myCar = BotCar(x_axis = 50, y_axis = 325)
+                    playerCar = PlayerCar((resW - 50, 400))
+                    myCar = BotCar((50, 325))
                     BotCars.add(myCar)
                     player.add(playerCar)
                     playerCar.setCollide(BotCars)
