@@ -240,7 +240,7 @@ while True:
                 paused_time = 0
                 player.remove(playerCar)
                 BotCars.remove(myCar)
-                playerCar, myCar = refresh_cars(PlayerCar((resW - 50, 400)), BotCar((50, 325)))
+                playerCar, myCar = refresh_cars(PlayerCar((resW - 50, 400), 180), BotCar((50, 325)))
                 start_time = pygame.time.get_ticks()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
@@ -249,7 +249,7 @@ while True:
                 paused_time = 0
                 player.remove(playerCar)
                 BotCars.remove(myCar)
-                playerCar, myCar = refresh_cars(PlayerCar((resW - 50, 400)), BotCar((50, 325)))
+                playerCar, myCar = refresh_cars(PlayerCar((resW - 50, 400), 180), BotCar((50, 325)))
 
     #----end event loop----
 
@@ -285,7 +285,7 @@ while True:
             case 1:
                 if level_list[level_choice - 1] == None:
                     x_flip = True
-                    playerCar = PlayerCar((resW - 50, 400))
+                    playerCar = PlayerCar((resW - 50, 400), 180)
                     myCar = BotCar((50, 325))
                     BotCars.add(myCar)
                     player.add(playerCar)
