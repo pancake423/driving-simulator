@@ -113,11 +113,11 @@ retry_surf = menu_font.render(ask_retry, False, 'red')
 retry_rect = retry_surf.get_rect(midtop = (resW / 2, 100))
 
 BotCars = pygame.sprite.Group()
-myCar = BotCar()
+myCar = BotCar((200, 200))
 BotCars.add(myCar)
     
 player = pygame.sprite.GroupSingle()
-playerCar = PlayerCar()
+playerCar = PlayerCar((600, 600))
 player.add(playerCar)
     
 playerCar.setCollide(BotCars)
@@ -177,11 +177,11 @@ while True:
                 play_state = True
                 end_state = False
                 player.remove(playerCar)
-                playerCar = PlayerCar()
+                playerCar = PlayerCar((600, 600))
                 player.add(playerCar)
                 #playerCar.setImage()
                 BotCars.remove(myCar)
-                myCar = BotCar()
+                myCar = BotCar((200, 200))
                 BotCars.add(myCar)
                 playerCar.setCollide(BotCars)
                 myCar.setCollide(player)

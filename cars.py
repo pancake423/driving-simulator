@@ -2,21 +2,23 @@ import pygame
 import math
 
 class AbstractCar(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, START, startAngle = 0):
         super().__init__()
         
-        self.length = 50
+        self.length = 100
         self.maxSpeed = 10
-        self.turnSpeed = 0.5
+        self.turnSpeed = 0.3
         self.velocity = 0
         self.acceleration = 0.2
-        self.angle = 0 #Direction the car is facing
+        self.angle = startAngle % 360 # Direction the car is facing (increased angle is clockwise rotation)
         self.stopped = False
         self.collideGroup = None
         
+        self.subX, self.subY = 0, 0 # Keeps track of small changes in position
+        
         self.setImage()
         self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=(self.START))
+        self.rect = self.image.get_rect(center=(START))
         
     def setImage(self):
         ratio = self.IMG.get_width() / self.IMG.get_height()
@@ -34,7 +36,15 @@ class AbstractCar(pygame.sprite.Sprite):
     
     def decelerate(self):
         self.velocity -= self.acceleration
-        self.velocity = max(-self.maxSpeed, self.velocity)
+        self.velocity = max(-0.5*self.maxSpeed, self.velocity)
+        
+    def brake(self):
+        if self.velocity > 0:
+            self.velocity -= self.acceleration
+            self.velocity = max(0, self.velocity)
+        else:
+            self.velocity += self.acceleration
+            self.velocity = min(0, self.velocity)
         
     def turn(self, dir):
         oldCenter = self.rect.center
@@ -55,6 +65,14 @@ class AbstractCar(pygame.sprite.Sprite):
         delta_x = self.velocity * math.cos(math.radians(self.angle))
         delta_y = self.velocity * math.sin(math.radians(self.angle))
         
+        self.subX += delta_x - int(delta_x)
+        self.subY += delta_y - int(delta_y)
+        
+        delta_x += int(self.subX)
+        delta_y += int(self.subY)
+        self.subX -= int(self.subX)
+        self.subY -= int(self.subY)
+        
         self.rect.move_ip(delta_x, delta_y)
         
     def getRect(self):
@@ -66,20 +84,25 @@ class AbstractCar(pygame.sprite.Sprite):
                 self.stop()
                 pygame.mixer.Sound.play(self.crash_sound)
                 self.image = pygame.image.load("assets\\explosion.png")
-                self.image = pygame.transform.smoothscale(self.image, (50, 50)).convert_alpha()
+                self.image = pygame.transform.smoothscale(self.image, (self.length, self.length)).convert_alpha()
             
     def setCollide(self, group):
         self.collideGroup = group
         
     def isStopped(self):
         return self.stopped
+    
+    def getAngle(self):
+        return self.angle
+    
+    def getSpeed(self):
+        return self.velocity
         
 class PlayerCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-blue.png")
-    START = (1000,400)
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, START):
+        super().__init__(START)
         self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
         self.crash_sound.set_volume(0.3)
         
@@ -102,13 +125,15 @@ class PlayerCar(AbstractCar):
             
 class BotCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-red.png")
-    START = (100, 100)
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, START):
+        super().__init__(START)
         self.target = (self.rect.center)
         self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
         self.crash_sound.set_volume(0.3)
+        self.stopTarget = False
+        self.nextTargets = []
+        self.targetBuffer = 30
     
     #Move the bot towards the target
     def bot_move(self):
@@ -127,15 +152,32 @@ class BotCar(AbstractCar):
                 self.turn("left")
                 
         # Change speed
-        if distance > 20:
-            if dAngle <= 90 or dAngle >= 270:
-                self.accelerate()
+        if self.stopTarget:
+            targetSpeed = (0.015*distance)**1.6
+        else:
+            targetSpeed = float("inf")
+        
+        if distance > self.targetBuffer:
+            angleBuffer = 30
+            if dAngle <= 90 - angleBuffer or dAngle >= 270 + angleBuffer:
+                speedBuffer = 2
+                if self.velocity < targetSpeed - speedBuffer:
+                    self.accelerate()
+                elif self.velocity > targetSpeed + speedBuffer:
+                    self.decelerate()
             else:
                 self.decelerate()
+        else:
+            self.brake()
     
-    def setTarget(self, target):
+    def setTarget(self, target, stopAtTarget=False):
         self.target = target
+        self.stopTarget = stopAtTarget # True to stop, False to keep going
         
+    def addTargets(self, targets):
+        for target in targets:
+            self.nextTargets.append(target)
+    
     # Returns True when near target and ready for next one
     def newTarget(self):
         x, y = self.rect.center
@@ -143,13 +185,18 @@ class BotCar(AbstractCar):
         dX, dY = targetX - x, targetY - y
         distance = math.sqrt(dX**2 + dY**2)
         
-        return distance <= 20
+        return distance <= self.targetBuffer
+    
+    def queuedTargets(self):
+        return len(self.nextTargets)
     
     def update(self):
         self.checkCollison()
         if self.stopped == False:
             self.bot_move()
             self.move()
+            if self.newTarget() and len(self.nextTargets) > 0:
+                self.target = self.nextTargets.pop(0)
     
 if __name__ == "__main__":
     pygame.init()
@@ -157,22 +204,26 @@ if __name__ == "__main__":
     pygame.display.set_caption("AI Car demo")
     
     BotCars = pygame.sprite.Group()
-    myCar = BotCar()
+    myCar = BotCar((100, 100))
     BotCars.add(myCar)
     
     player = pygame.sprite.GroupSingle()
-    playerCar = PlayerCar()
+    playerCar = PlayerCar((1000, 400))
     player.add(playerCar)
     
     playerCar.setCollide(BotCars)
     myCar.setCollide(player)
+    
+    # List of targets to hit before following user mouse
+    myCar.addTargets([(700, 200), (600, 500), (200, 200), (600, 400)])
     
     clock = pygame.time.Clock()
     run = True
     while run:
         clock.tick(60)
         screen.fill((50, 200, 50))
-        myCar.setTarget(pygame.mouse.get_pos())
+        if myCar.queuedTargets() == 0:
+            myCar.setTarget(pygame.mouse.get_pos(), True) # True to stop at mouse, False to continue
         BotCars.update()
         player.update()
         BotCars.draw(screen)
