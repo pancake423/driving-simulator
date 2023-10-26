@@ -165,7 +165,7 @@ class RoadLane(RectSprite):
 		center = ((x + x2) / 2, (y + y2) / 2)
 
 		#figure out rotation and movement of rel_x and rel_y
-		self.image = pygame.transform.rotate(self.image, self.direction);
+		self.image = pygame.transform.rotate(self.image, self.direction)
 		self.rect = self.image.get_rect()
 
 		size = self.image.get_size()
