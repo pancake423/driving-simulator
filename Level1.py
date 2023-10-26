@@ -2,9 +2,10 @@ import pygame
 from levels import Level
 
 def level_One(screen, screen_width, screen_height):
-    pygame.init()
+    #pygame.init()
 
     # Create a level instance
+
     level = Level(screen_width, screen_height)
 
     # Define coordinates for the horizontal roads
@@ -35,19 +36,20 @@ def level_One(screen, screen_width, screen_height):
     level.add_vertical_road(x1, v_st_1, v_end_1)
     level.add_vertical_road(x2, v_st_2, v_end_2)
     level.add_intersection(inter_x, inter_y)
+
     # Main game loop
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+    #running = True
+    #while running:
+     #   for event in pygame.event.get():
+      #      if event.type == pygame.QUIT:
+       #         running = False
 
-        screen.fill(Level.BG_COLOR)
-        level.draw(screen, 0, 0)
-        pygame.display.flip()
+        #screen.fill(Level.BG_COLOR)
+        #level.draw(screen, 0, 0)
+        #pygame.display.flip()
 
-    pygame.quit()
-    return running
+    #pygame.quit()
+    return level
 
 # Entry point for your program
 if __name__ == "__main__":
