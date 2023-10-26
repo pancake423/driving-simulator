@@ -291,7 +291,7 @@ while True:
                     player.add(playerCar)
                     playerCar.setCollide(BotCars)
                     myCar.setCollide(player)
-                    level_list[level_choice - 1] = level_One(screen, 0, 0)
+                    level_list[level_choice - 1] = level_One(screen, resW, resH)
                       
                 screen.fill(Level.BG_COLOR)
                 myCar.setTarget(pygame.mouse.get_pos())
