@@ -37,6 +37,9 @@ def level_One(screen, screen_width, screen_height):
     level.add_vertical_road(x2, v_st_2, v_end_2)
     level.add_intersection(inter_x, inter_y)
 
+    level.add_random_decorations(30)
+
+
     return level
 
 # Entry point for your program

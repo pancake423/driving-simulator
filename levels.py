@@ -1,5 +1,7 @@
 import pygame
 import math
+import os
+import random
 
 class Level:
     BG_COLOR = (100, 200, 100) #grass color
@@ -16,9 +18,12 @@ class Level:
         self.sub_layer = pygame.sprite.Group();
         self.road_layer = pygame.sprite.Group();
         self.top_layer = pygame.sprite.Group();
+        self.x = -1
+        self.y = -1
 
     #draw the level on the target surface such that the pixel at x, y is at the top left of the target.
     def draw(self, target, x, y):
+
         self._set_translate(x, y)
         w = target.get_width()
         h = target.get_height()
@@ -27,7 +32,9 @@ class Level:
         self.sub_layer.draw(target)
         self.road_layer.draw(target)
         self.top_layer.draw(target)
-        pass
+
+        self.x = x
+        self.y = y
 
     def add_horizontal_road(self, start_x, end_x, y):
         #two lanes.
@@ -113,6 +120,25 @@ class Level:
             RoadLane(sx + outer_lane, sy, sx + outer_lane, sy + width)
         )
 
+    def add_random_decorations(self,n):
+        #adds n random decorations. Flowers, grass, rocks.
+        DECORATION_PATHS = [
+            os.path.join("assets", "flower-blue.png"),
+            os.path.join("assets", "flower-white.png"),
+            #os.path.join("assets", "pebbles.png"),
+        ]
+        self._set_translate(self.x, self.y)
+        for _ in range(n):
+            img = ImageSprite(
+                random.randint(0, self.width),
+                random.randint(0, self.height),
+                random.choice(DECORATION_PATHS)
+            )
+            img.scale(0.5)
+            img._set_translate(self.x, self.y)
+            if pygame.sprite.spritecollideany(img, self.sub_layer) == None:
+                self.sub_layer.add(img)
+
     #internal method used to set the translation of all sprites relative to their starting position.
     def _set_translate(self, x, y):
         for sprite in self.sub_layer.sprites():
@@ -152,9 +178,16 @@ class ImageSprite(pygame.sprite.Sprite):
         self.image = pygame.image.load(image_path)
         self.rect = self.image.get_rect()
 
+    def scale(self, factor):
+        size = self.rect.size
+        new_size = (math.floor(size[0] * factor), math.floor(size[1] * factor))
+        self.image = pygame.transform.scale(self.image, new_size)
+        self.rect = self.image.get_rect()
+
+
     def _set_translate(self, x, y):
-        self.rect.x = x - self.rel_x
-        self.rect.y = y - self.rel_y
+        self.rect.x = self.rel_x - x
+        self.rect.y = self.rel_y - y
 
 class RoadLane(RectSprite):
     #(x, y) and (x2, y2) are the endpoints of the center of the lane.
