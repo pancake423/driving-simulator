@@ -44,7 +44,7 @@ class Level:
             RectSprite(start_x, top, total_length, total_width, Level.LANE_COLOR)
         )
         self.road_layer.add(
-            RoadLane(start_x, lane_1_y, end_x, lane_1_y),
+            RoadLane(end_x, lane_1_y, start_x, lane_1_y),
             RoadLane(start_x, lane_2_y, end_x, lane_2_y)
         )
         self.top_layer.add(
@@ -75,7 +75,7 @@ class Level:
         )
         self.road_layer.add(
             RoadLane(lane_1_x, start_y, lane_1_x, end_y),
-            RoadLane(lane_2_x, start_y, lane_2_x, end_y)
+            RoadLane(lane_2_x, end_y, lane_2_x, start_y)
         )
         self.top_layer.add(
             RectSprite(left + Level.LINE_WIDTH*2, start_y,
