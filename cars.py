@@ -12,7 +12,7 @@ class AbstractCar(pygame.sprite.Sprite):
         self.acceleration = 0.2
         self.angle = startAngle % 360 # Direction the car is facing (increased angle is clockwise rotation)
         self.stopped = False
-        self.collideGroup = None
+        self.collideGroups = []
         
         self.subX, self.subY = 0, 0 # Keeps track of small changes in position
         
@@ -79,15 +79,16 @@ class AbstractCar(pygame.sprite.Sprite):
         return self.rect
     
     def checkCollison(self):
-        if self.collideGroup != None:
-            if len(pygame.sprite.spritecollide(self,self.collideGroup,False,pygame.sprite.collide_mask)) > 0 and not self.stopped:
-                self.stop()
-                pygame.mixer.Sound.play(self.crash_sound)
-                self.image = pygame.image.load("assets\\explosion.png")
-                self.image = pygame.transform.smoothscale(self.image, (self.length, self.length)).convert_alpha()
+        if len(self.collideGroups) > 0:
+            for group in self.collideGroups:
+                if len(pygame.sprite.spritecollide(self,group,False,pygame.sprite.collide_mask)) > 0 and not self.stopped:
+                    self.stop()
+                    pygame.mixer.Sound.play(self.crash_sound)
+                    self.image = pygame.image.load("assets\\explosion.png")
+                    self.image = pygame.transform.smoothscale(self.image, (self.length, self.length)).convert_alpha()
             
     def setCollide(self, group):
-        self.collideGroup = group
+        self.collideGroups.append(group)
         
     def isStopped(self):
         return self.stopped
@@ -198,6 +199,71 @@ class BotCar(AbstractCar):
             if self.newTarget() and len(self.nextTargets) > 0:
                 self.target = self.nextTargets.pop(0)
     
+#May move this to another file later
+class Pedestrian(pygame.sprite.Sprite):
+    def __init__(self, startPos, startAngle = 0):
+        super().__init__()
+        self.angle = startAngle % 360
+        self.collideGroups = []
+        self.hit = False
+        self.length = 50
+        self.setImage()
+        self.rect = self.image.get_rect(center=(startPos))
+        self.target = (self.rect.center)
+        self.speed = 0.03
+        
+    def setImage(self):
+        #Added logic for walking animation
+        frame_1 = pygame.image.load("assets\\Pedestrian1.png")
+        ratio = frame_1.get_width() / frame_1.get_height()
+        frame_1 = pygame.transform.smoothscale(frame_1, (self.length*ratio, self.length)).convert_alpha()
+        frame_2 = pygame.image.load("assets\\Pedestrian2.png")
+        ratio = frame_2.get_width() / frame_2.get_height()
+        frame_2 = pygame.transform.smoothscale(frame_2, (self.length*ratio, self.length)).convert_alpha()
+        pygame.transform.smoothscale(frame_2, (self.length*ratio, self.length)).convert_alpha()
+        
+        self.walk_frames = [frame_1,frame_2]
+        self.walk_index = 0
+        self.image = self.walk_frames[self.walk_index]
+        self.image = pygame.transform.rotate(self.image, self.angle)
+        
+
+    def checkCollison(self):
+        if self.collideGroups != []:
+            for group in collideGroups:
+                if len(pygame.sprite.spritecollide(self,group,False,pygame.sprite.collide_mask)) > 0 and not self.stopped:
+                    self.hit = True
+                    pygame.mixer.Sound.play(self.crash_sound)
+                    self.image = pygame.image.load("assets\\explosion.png")
+                    self.image = pygame.transform.smoothscale(self.image, (self.length, self.length)).convert_alpha()
+                    
+    def setCollide(self, group):
+        self.collideGroups.append(group)
+    
+    def setTarget(self,target):
+        self.target = target
+        
+    def walk(self):
+        x, y = self.rect.center
+        targetX, targetY = self.target
+        delta_x = targetX - x
+        delta_y = targetY - y
+        self.buffer = 5
+        if abs(delta_x) > self.buffer or abs(delta_y) > self.buffer:
+            self.rect.move_ip(self.speed*delta_x, self.speed*delta_y)
+            self.walk_index += 0.1
+            if self.walk_index > len(self.walk_frames):
+                self.walk_index = 0
+            self.image = self.walk_frames[int(self.walk_index)]
+            
+    def update(self):
+        if self.hit == False:
+            self.walk()
+            
+            
+        
+        
+    
 if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode((1080, 720))
@@ -211,23 +277,35 @@ if __name__ == "__main__":
     playerCar = PlayerCar((1000, 400))
     player.add(playerCar)
     
+    Pedestrians = pygame.sprite.Group()
+    guy = Pedestrian((500,200))
+    Pedestrians.add(guy)
+    
     playerCar.setCollide(BotCars)
     myCar.setCollide(player)
+    playerCar.setCollide(Pedestrians)
+    myCar.setCollide(Pedestrians)
+    guy.setCollide(BotCars)
+    guy.setCollide(player)
     
     # List of targets to hit before following user mouse
     myCar.addTargets([(700, 200), (600, 500), (200, 200), (600, 400)])
+    
     
     clock = pygame.time.Clock()
     run = True
     while run:
         clock.tick(60)
         screen.fill((50, 200, 50))
+        guy.setTarget(pygame.mouse.get_pos())
         if myCar.queuedTargets() == 0:
             myCar.setTarget(pygame.mouse.get_pos(), True) # True to stop at mouse, False to continue
         BotCars.update()
         player.update()
+        Pedestrians.update()
         BotCars.draw(screen)
         player.draw(screen)
+        Pedestrians.draw(screen)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
