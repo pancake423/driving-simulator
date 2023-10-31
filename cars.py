@@ -6,8 +6,8 @@ class AbstractCar(pygame.sprite.Sprite):
         super().__init__()
         
         self.length = 100
-        self.maxSpeed = 10
-        self.turnSpeed = 0.3
+        self.maxSpeed = 8
+        self.turnSpeed = 0.4
         self.velocity = 0
         self.acceleration = 0.2
         self.angle = startAngle % 360 # Direction the car is facing (increased angle is clockwise rotation)
@@ -98,6 +98,9 @@ class AbstractCar(pygame.sprite.Sprite):
     
     def getSpeed(self):
         return self.velocity
+    
+    def getPos(self):
+        return self.rect.center
         
 class PlayerCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-blue.png")
@@ -114,9 +117,17 @@ class PlayerCar(AbstractCar):
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.decelerate()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.turn("left")
+            if self.velocity > 0:
+                self.turn("left")
+            else:
+                self.turn("right")
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.turn("right")        
+            if self.velocity > 0:
+                self.turn("right")
+            else:
+                self.turn("left")
+        if keys[pygame.K_SPACE]:
+            self.brake()
     
     def update(self):
         self.checkCollison()
@@ -266,7 +277,7 @@ class Pedestrian(pygame.sprite.Sprite):
     
 if __name__ == "__main__":
     pygame.init()
-    screen = pygame.display.set_mode((1080, 720))
+    screen = pygame.display.set_mode((1080, 720), pygame.FULLSCREEN)
     pygame.display.set_caption("AI Car demo")
     
     BotCars = pygame.sprite.Group()
