@@ -145,7 +145,7 @@ class Level:
         collisions = []
         for lane in self.road_layer.sprites():
             if pygame.sprite.collide_mask(sprite, lane) != None:
-                collisions.append(lanes)
+                collisions.append(self.lanes)
         return collisions
 
 
@@ -203,8 +203,8 @@ class RoadLane(RectSprite):
         self.rect = self.image.get_rect()
 
         size = self.image.get_size()
-        self.rel_x = math.floor(center[0] - 0.5*size[0])
-        self.rel_y = math.floor(center[1] - 0.5*size[1])
+        self.rel_x = math.floor(self.center[0] - 0.5*size[0])
+        self.rel_y = math.floor(self.center[1] - 0.5*size[1])
 
         #x, y, stop
         self.target_points = [
