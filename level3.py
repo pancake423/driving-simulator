@@ -12,12 +12,26 @@ def level_Three(screen, screen_width, screen_height):
     #Initialize font
     pygame.font.init()
 
-
     #font type
     fontType = "fonts/Get Now.ttf"
     levelFont = pygame.font.Font(fontType, 40)
     level_surf = levelFont.render(levelNum, True, "red")
     level_rect = level_surf.get_rect(topright = (screen_width - 20, 20))
+    
+    topLaneY = screen_height / 2 - 110
+    botLaneY = screen_height / 2 + 10
+    
+    playerCar = PlayerCar((80, botLaneY))
+    playerGroup = pygame.sprite.GroupSingle()
+    playerGroup.add(playerCar)
+    
+    botCar = BotCar((screen_width, topLaneY), 180)
+    botGroup = pygame.sprite.Group()
+    botGroup.add(botCar)
+    botCar.setTarget((-1000, topLaneY))
+    
+    playerCar.setCollide(botGroup)
+    botCar.setCollide(playerGroup)
 
     #displays level 6 on screen
     pygame.display.set_caption(levelNum)
@@ -25,26 +39,29 @@ def level_Three(screen, screen_width, screen_height):
     #create a level instance
     level = Level(screen_width, screen_height)
     
+    
     #Create coordinates for the horizontal road
     fh_start_x = 0  
-    fh_end_x = 432.5
-    fh_y = 360
+    fh_end_x = 840
+    fh_y = 540
 
-    sh_start_x = 647.5
-    sh_end_x = 1080
-    sh_y = 360
+    sh_start_x = 1060
+    sh_end_x = 2160
+    sh_y = 540
 
     #Coordinates for vertical roads
     #R1
-    v_st_1 = 467.5
-    v_end_1 = 720
-    x1 = 540
+    v_st_1 = 1485
+    v_end_1 = 650
+    x1 = 955
+    
     v_st_2 = 0
-    v_end_2 = 252.5
-    x2 = 540
+    v_end_2 = 430
+    x2 = 955
+    
     
     # coordinates for intersection
-    inter_x = screen_width // 2
+    inter_x = screen_width // 2.02
     inter_y = screen_height // 2
     
     #call functions to add roads, intersections, etc
@@ -61,24 +78,42 @@ def level_Three(screen, screen_width, screen_height):
     stopSign = pygame.transform.smoothscale(stopSign,(60, 60)).convert_alpha()
 
     # Main game loop
+    clock = pygame.time.Clock()
     running = True
+    botTurned = False
     while running:
+        clock.tick(60)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
         # Clear the screen
-        screen.fill(Level.BG_COLOR)
+        screen.fill(Level.BG_COLOR) 
 
         # Draw the level
         level.draw(screen, 0, 0)
+        
 
         screen.blit(level_surf, level_rect)
-        screen.blit(stopSign, (350, 490))
-        screen.blit(stopSign, (670, 490))
-        screen.blit(stopSign, (670, 167))
-        screen.blit(stopSign, (350, 167))
+        screen.blit(stopSign, (760, 670))
+        screen.blit(stopSign, (1090, 670))
+        screen.blit(stopSign, (1090, 350))
+        screen.blit(stopSign, (760, 350))
         #display_score()
+
+        
+        playerGroup.update()
+        botGroup.update()
+        playerGroup.draw(screen)
+        botGroup.draw(screen)
+        
+        playerPos, botPos = playerCar.getPos(), botCar.getPos()
+        playerX, playerY = playerPos
+        botX, botY = botPos
+        
+        if not botTurned and botX - playerX < 450:
+            botCar.setTarget((playerX + 100, playerY), True)
+            botTurned = True
 
         # Update the display
         pygame.display.flip()
@@ -103,9 +138,9 @@ if __name__ == "__main__":
     pygame.init()
     540
     # Set screen
-    screen_width = 1080
-    screen_height = 720
-    screen = pygame.display.set_mode((screen_width, screen_height))
+    screen_width = 1920
+    screen_height = 1080
+    screen = pygame.display.set_mode((screen_width, screen_height),pygame.FULLSCREEN)
     
     #calls the level_Three() Funcntion
     print(level_Three(screen, screen_width, screen_height))
