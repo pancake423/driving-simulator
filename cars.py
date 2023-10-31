@@ -241,7 +241,7 @@ class Pedestrian(pygame.sprite.Sprite):
 
     def checkCollison(self):
         if self.collideGroups != []:
-            for group in collideGroups:
+            for group in self.collideGroups:
                 if len(pygame.sprite.spritecollide(self,group,False,pygame.sprite.collide_mask)) > 0 and not self.stopped:
                     self.hit = True
                     pygame.mixer.Sound.play(self.crash_sound)

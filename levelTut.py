@@ -1,12 +1,15 @@
 import pygame
 from levels import Level
 
-def level_One(screen, screen_width, screen_height):
+def level_Tutorial(screen, screen_width, screen_height):
     #pygame.init()
 
     # Create a level instance
 
     level = Level(screen_width, screen_height)
+    
+    stopSign= pygame.image.load('assets/NewTempStop.png')
+    stopSign = pygame.transform.smoothscale(stopSign,(60, 60)).convert_alpha()
 
     # Define coordinates for the horizontal roads
     fh_start_x = 0
@@ -32,6 +35,7 @@ def level_One(screen, screen_width, screen_height):
     # Call functions to add roads, intersections, etc
     level.add_horizontal_road(fh_start_x, fh_end_x, fh_y)
     level.add_horizontal_road(sh_start_x, sh_end_x, sh_y)
+
     # Add vertical roads and intersection as needed
     level.add_vertical_road(x1, v_st_1, v_end_1)
     level.add_vertical_road(x2, v_st_2, v_end_2)
@@ -40,12 +44,3 @@ def level_One(screen, screen_width, screen_height):
     level.add_random_decorations(30)
 
     return level
-
-# Entry point for your program
-if __name__ == "__main__":
-    screen_width = 1080
-    screen_height = 720
-    screen = pygame.display.set_mode((screen_width, screen_height))
-
-    while level_One(screen, screen_width, screen_height):
-        pass  # The game loop will keep running until the game is closed
