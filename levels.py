@@ -109,6 +109,16 @@ class Level:
         self.sub_layer.add(
             RoadLane(x1, y1, x2, y2, width=total_width)
         )
+        self.road_layer.add(
+            RoadLane(
+                *move_perp(x1, y1, Level.LANE_WIDTH/2 + Level.LINE_WIDTH*1.5),
+                *move_perp(x2, y2, Level.LANE_WIDTH/2 + Level.LINE_WIDTH*1.5),
+            )
+            RoadLane(
+                *move_perp(x2, y2, Level.LANE_WIDTH/-2 + Level.LINE_WIDTH*-1.5),
+                *move_perp(x1, y1, Level.LANE_WIDTH/-2 + Level.LINE_WIDTH*-1.5),
+            )
+        )
         #TODO: lines and lanes
 
     def add_intersection(self, x, y):
@@ -154,6 +164,7 @@ class Level:
     def join_road_paths(self):
         #searches for road lanes that are connected and automatically stitches their paths together
         #ignores any roads that already have a connection set for nextTarget
+        pass
 
     #internal method used to set the translation of all sprites relative to their starting position.
     def _set_translate(self, x, y):
@@ -164,12 +175,13 @@ class Level:
         for sprite in self.top_layer.sprites():
             sprite._set_translate(x, y)
 
-    def get_target(self, sprite):
+    def get_targets(self, sprite):
         #returns the road lane that the given sprite is colliding with
+        collisions = []
         for lane in self.road_layer.sprites():
             if pygame.sprite.collide_mask(sprite, lane) != None:
-                return lane
-        return None;
+                collisions.append(lanes)
+        return collisions
 
 
 #just a plain rectangle.
