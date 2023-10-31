@@ -26,8 +26,12 @@ def level_Three(screen, screen_width, screen_height):
     playerGroup.add(playerCar)
     
     botCar = BotCar((screen_width, topLaneY), 180)
+    botCar2 = BotCar((screen_width, topLaneY), 180)
+    botCar3 = BotCar((screen_width, topLaneY), 180)
     botGroup = pygame.sprite.Group()
     botGroup.add(botCar)
+    botGroup.add(botCar2)
+    botGroup.add(botCar3)
     botCar.setTarget((-1000, topLaneY))
     
     playerCar.setCollide(botGroup)
@@ -113,6 +117,8 @@ def level_Three(screen, screen_width, screen_height):
         
         if not botTurned and botX - playerX < 450:
             botCar.setTarget((playerX + 100, playerY), True)
+            botCar2.setTarget((playerX + 100, playerY), True)
+            botCar3.setTarget((playerX + 100, playerY), True)
             botTurned = True
 
         # Update the display
