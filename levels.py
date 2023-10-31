@@ -22,16 +22,16 @@ class Level:
         self.y = -1
 
     #draw the level on the target surface such that the pixel at x, y is at the top left of the target.
-    def draw(self, target, x, y):
+    def draw(self, target, x, y, debug=False):
 
         self._set_translate(x, y)
-        w = target.get_width()
-        h = target.get_height()
 
         target.fill(Level.BG_COLOR)
-        self.sub_layer.draw(target)
-        self.road_layer.draw(target)
-        self.top_layer.draw(target)
+        if debug:
+            self.road_layer.draw(target)
+        else:
+            self.sub_layer.draw(target)
+            self.top_layer.draw(target)
 
         self.x = x
         self.y = y
@@ -48,7 +48,8 @@ class Level:
         lane_2_y = math.floor(top + Level.LINE_WIDTH*6 + Level.LANE_WIDTH*1.5)
 
         self.sub_layer.add(
-            RectSprite(start_x, top, total_length, total_width, Level.LANE_COLOR)
+            #1px padding to protect from rounding errors
+            RectSprite(start_x - 1, top - 1, total_length + 2, total_width + 2, Level.LANE_COLOR)
         )
         self.road_layer.add(
             RoadLane(end_x, lane_1_y, start_x, lane_1_y),
@@ -78,7 +79,7 @@ class Level:
         lane_2_x = math.floor(left + Level.LINE_WIDTH*6 + Level.LANE_WIDTH*1.5)
 
         self.sub_layer.add(
-            RectSprite(left, start_y, total_width, total_length, Level.LANE_COLOR)
+            RectSprite(left-1, start_y-1, total_width+2, total_length+2, Level.LANE_COLOR)
         )
         self.road_layer.add(
             RoadLane(lane_1_x, start_y, lane_1_x, end_y),
@@ -98,6 +99,27 @@ class Level:
                 Level.LINE_WIDTH, total_length, 
                 Level.W_LINE_COLOR),
         )
+    def add_diagonal_road(self, x1, y1, x2, y2):
+        #road implementation supporting diagonals
+        total_width = Level.LANE_WIDTH * 2 + Level.LINE_WIDTH * 9
+        slope = math.atan2(y2 - y1, x2 - x1)
+        move_para = lambda x, y, dist: (x + math.cos(slope)*dist, y + math.sin(slope)*dist)
+        move_perp = lambda x, y, dist: (x + math.cos(slope + math.pi/2)*dist, y + math.sin(slope + math.pi/2)*dist)
+
+        self.sub_layer.add(
+            RoadLane(x1, y1, x2, y2, width=total_width)
+        )
+        self.road_layer.add(
+            RoadLane(
+                *move_perp(x1, y1, Level.LANE_WIDTH/2 + Level.LINE_WIDTH*1.5),
+                *move_perp(x2, y2, Level.LANE_WIDTH/2 + Level.LINE_WIDTH*1.5),
+            )
+            RoadLane(
+                *move_perp(x2, y2, Level.LANE_WIDTH/-2 + Level.LINE_WIDTH*-1.5),
+                *move_perp(x1, y1, Level.LANE_WIDTH/-2 + Level.LINE_WIDTH*-1.5),
+            )
+        )
+        #TODO: lines and lanes
 
     def add_intersection(self, x, y):
         #x, y is the center of the intersection
@@ -139,6 +161,11 @@ class Level:
             if pygame.sprite.spritecollideany(img, self.sub_layer) == None:
                 self.sub_layer.add(img)
 
+    def join_road_paths(self):
+        #searches for road lanes that are connected and automatically stitches their paths together
+        #ignores any roads that already have a connection set for nextTarget
+        pass
+
     #internal method used to set the translation of all sprites relative to their starting position.
     def _set_translate(self, x, y):
         for sprite in self.sub_layer.sprites():
@@ -147,6 +174,15 @@ class Level:
             sprite._set_translate(x, y)
         for sprite in self.top_layer.sprites():
             sprite._set_translate(x, y)
+
+    def get_targets(self, sprite):
+        #returns the road lane that the given sprite is colliding with
+        collisions = []
+        for lane in self.road_layer.sprites():
+            if pygame.sprite.collide_mask(sprite, lane) != None:
+                collisions.append(lanes)
+        return collisions
+
 
 #just a plain rectangle.
 #since roads are dynamic in length and made up of these,
@@ -191,8 +227,8 @@ class ImageSprite(pygame.sprite.Sprite):
 
 class RoadLane(RectSprite):
     #(x, y) and (x2, y2) are the endpoints of the center of the lane.
-    def __init__(self, x, y, x2, y2):
-        super().__init__(x, y, math.dist((x, y), (x2, y2)), Level.LANE_WIDTH, Level.LANE_COLOR)
+    def __init__(self, x, y, x2, y2, width=Level.LANE_WIDTH, color=Level.LANE_COLOR):
+        super().__init__(x, y, math.dist((x, y), (x2, y2)), width, color)
 
         self.direction = math.degrees(math.atan2(y2 - y, x2 - x))
         center = ((x + x2) / 2, (y + y2) / 2)
@@ -204,3 +240,27 @@ class RoadLane(RectSprite):
         size = self.image.get_size()
         self.rel_x = math.floor(center[0] - 0.5*size[0])
         self.rel_y = math.floor(center[1] - 0.5*size[1])
+
+        #x, y, stop
+        self.target_points = [
+            (x, y, False),
+            (x2, y2, False)
+        ]
+
+        #other RoadLane objects.
+        self.next_target = {
+            "left": None,
+            "straight": None,
+            "right": None
+        }
+
+class StopZone(RoadLane):
+    def __init__(self, x, y, x2, y2):
+        super().__init__(x, y, x2, y2)
+        self.target_points = [
+            (x, y, False),
+            (math.floor((x + x2) / 2), math.floor((y + y2) / 2), True),
+            (x2, y2, False)
+        ]
+        self.can_go = False
+
