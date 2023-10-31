@@ -93,8 +93,8 @@ level_count = 5
 level_choice = 0
 
 #for screen width and heigth, defined and initialized here to make changing easy
-resW = 1080
-resH = 720
+resW = 1920
+resH = 1080
 resCH = 320
 
 #set the screen using resW and resH as arguments
