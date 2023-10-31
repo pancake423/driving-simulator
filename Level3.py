@@ -5,6 +5,7 @@ from cars import PlayerCar, BotCar
 def level_Three(screen, screen_width, screen_height):
     level = Level(screen_width, screen_height)
     level.add_horizontal_road(0, screen_width, screen_height / 2 - 53)
+    level.add_random_decorations(30)
     
     topLaneY = screen_height / 2 - 110
     botLaneY = screen_height / 2 + 10
