@@ -2,7 +2,7 @@ import pygame
 from levels import Level
 from cars import PlayerCar, BotCar
 
-def level_Three(screen, screen_width, screen_height):
+def level_Four(screen, screen_width, screen_height):
     level = Level(screen_width, screen_height)
     level.add_horizontal_road(0, screen_width, screen_height / 2 - 53)
     level.add_random_decorations(30)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     screen_height = 1080
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
     
-    print(level_Three(screen, screen_width, screen_height))
+    print(level_Four(screen, screen_width, screen_height))
     pygame.quit()
     
     
