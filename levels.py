@@ -218,6 +218,8 @@ class RoadLane(RectSprite):
             "straight": None,
             "right": None
         }
+    def get_center(self):
+        return self.center
 
 class StopZone(RoadLane):
     def __init__(self, x, y, x2, y2):
