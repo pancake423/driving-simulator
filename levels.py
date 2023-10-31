@@ -37,68 +37,11 @@ class Level:
         self.y = y
 
     def add_horizontal_road(self, start_x, end_x, y):
-        #two lanes.
-        #gap b/t lanes is 3x line width
-        #outside shoulder is 3x line width on each side.
-        total_width = Level.LANE_WIDTH * 2 + Level.LINE_WIDTH * 9
-        total_length = end_x - start_x
-
-        top = math.floor(y - total_width/2)
-        lane_1_y = math.floor(top + Level.LINE_WIDTH*3 + Level.LANE_WIDTH/2)
-        lane_2_y = math.floor(top + Level.LINE_WIDTH*6 + Level.LANE_WIDTH*1.5)
-
-        self.sub_layer.add(
-            #1px padding to protect from rounding errors
-            RectSprite(start_x - 1, top - 1, total_length + 2, total_width + 2, Level.LANE_COLOR)
-        )
-        self.road_layer.add(
-            RoadLane(end_x, lane_1_y, start_x, lane_1_y),
-            RoadLane(start_x, lane_2_y, end_x, lane_2_y)
-        )
-        self.top_layer.add(
-            RectSprite(start_x, top + Level.LINE_WIDTH*2, 
-                total_length, Level.LINE_WIDTH, 
-                Level.W_LINE_COLOR),
-            RectSprite(start_x, top + Level.LINE_WIDTH*3 + Level.LANE_WIDTH, 
-                total_length, Level.LINE_WIDTH, 
-                Level.Y_LINE_COLOR),
-            RectSprite(start_x, top + Level.LINE_WIDTH*5 + Level.LANE_WIDTH, 
-                total_length, Level.LINE_WIDTH, 
-                Level.Y_LINE_COLOR),
-            RectSprite(start_x, top + Level.LINE_WIDTH*6 + Level.LANE_WIDTH*2, 
-                total_length, Level.LINE_WIDTH, 
-                Level.W_LINE_COLOR),
-        )
+        self.add_diagonal_road(start_x, y, end_x, y)
 
     def add_vertical_road(self, x, start_y, end_y):
-        total_width = Level.LANE_WIDTH * 2 + Level.LINE_WIDTH * 9
-        total_length = end_y - start_y
+        self.add_diagonal_road(x, start_y, x, end_y)
 
-        left = math.floor(x - total_width/2)
-        lane_1_x = math.floor(left + Level.LINE_WIDTH*3 + Level.LANE_WIDTH/2)
-        lane_2_x = math.floor(left + Level.LINE_WIDTH*6 + Level.LANE_WIDTH*1.5)
-
-        self.sub_layer.add(
-            RectSprite(left-1, start_y-1, total_width+2, total_length+2, Level.LANE_COLOR)
-        )
-        self.road_layer.add(
-            RoadLane(lane_1_x, start_y, lane_1_x, end_y),
-            RoadLane(lane_2_x, end_y, lane_2_x, start_y)
-        )
-        self.top_layer.add(
-            RectSprite(left + Level.LINE_WIDTH*2, start_y,
-                Level.LINE_WIDTH, total_length,
-                Level.W_LINE_COLOR),
-            RectSprite(left + Level.LINE_WIDTH*3 + Level.LANE_WIDTH, start_y, 
-                Level.LINE_WIDTH, total_length, 
-                Level.Y_LINE_COLOR),
-            RectSprite(left + Level.LINE_WIDTH*5 + Level.LANE_WIDTH, start_y,  
-                Level.LINE_WIDTH, total_length, 
-                Level.Y_LINE_COLOR),
-            RectSprite(left + Level.LINE_WIDTH*6 + Level.LANE_WIDTH*2, start_y, 
-                Level.LINE_WIDTH, total_length, 
-                Level.W_LINE_COLOR),
-        )
     def add_diagonal_road(self, x1, y1, x2, y2):
         #road implementation supporting diagonals
         total_width = Level.LANE_WIDTH * 2 + Level.LINE_WIDTH * 9
@@ -113,10 +56,32 @@ class Level:
             RoadLane(
                 *move_perp(x1, y1, Level.LANE_WIDTH/2 + Level.LINE_WIDTH*1.5),
                 *move_perp(x2, y2, Level.LANE_WIDTH/2 + Level.LINE_WIDTH*1.5),
-            )
+            ),
             RoadLane(
                 *move_perp(x2, y2, Level.LANE_WIDTH/-2 + Level.LINE_WIDTH*-1.5),
                 *move_perp(x1, y1, Level.LANE_WIDTH/-2 + Level.LINE_WIDTH*-1.5),
+            )
+        )
+        self.top_layer.add(
+            RoadLane(
+                *move_perp(x1, y1, Level.LINE_WIDTH),
+                *move_perp(x2, y2, Level.LINE_WIDTH),
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                *move_perp(x1, y1, -1*Level.LINE_WIDTH),
+                *move_perp(x2, y2, -1*Level.LINE_WIDTH),
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                *move_perp(x1, y1, Level.LINE_WIDTH*2 + Level.LANE_WIDTH),
+                *move_perp(x2, y2, Level.LINE_WIDTH*2 + Level.LANE_WIDTH),
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                *move_perp(x1, y1, Level.LINE_WIDTH*-2 - Level.LANE_WIDTH),
+                *move_perp(x2, y2, Level.LINE_WIDTH*-2 - Level.LANE_WIDTH),
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
             )
         )
         #TODO: lines and lanes
@@ -231,7 +196,7 @@ class RoadLane(RectSprite):
         super().__init__(x, y, math.dist((x, y), (x2, y2)), width, color)
 
         self.direction = math.degrees(math.atan2(y2 - y, x2 - x))
-        center = ((x + x2) / 2, (y + y2) / 2)
+        self.center = ((x + x2) / 2, (y + y2) / 2)
 
         #figure out rotation and movement of rel_x and rel_y
         self.image = pygame.transform.rotate(self.image, self.direction)
@@ -259,7 +224,7 @@ class StopZone(RoadLane):
         super().__init__(x, y, x2, y2)
         self.target_points = [
             (x, y, False),
-            (math.floor((x + x2) / 2), math.floor((y + y2) / 2), True),
+            self.center,
             (x2, y2, False)
         ]
         self.can_go = False
