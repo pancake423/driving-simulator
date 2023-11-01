@@ -10,7 +10,7 @@ def levelFive(screen, screen_width, screen_height):
     #Level Elements
     level = Level(screen_width, screen_height)
     level.add_horizontal_road(0,screen_width,screen_height/3)
-    #level.add_diagonal_road(0,screen_height,screen_width/2,screen_height/3)
+    level.add_diagonal_road(0,screen_height,screen_width/2,screen_height/3)
     level.add_random_decorations(20)
     
     #Player

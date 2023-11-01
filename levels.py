@@ -46,7 +46,6 @@ class Level:
         #road implementation supporting diagonals
         total_width = Level.LANE_WIDTH * 2 + Level.LINE_WIDTH * 9
         slope = math.atan2(y2-y1, x2-x1)
-        print(slope)
         move_para = lambda x, y, dist: (x + math.cos(slope)*dist, y + math.sin(slope)*dist)
         def move_perp (x, y, dist): 
             return (x + math.cos(slope + math.pi/2)*dist, y + math.sin(slope + math.pi/2)*dist)
@@ -197,7 +196,7 @@ class RoadLane(RectSprite):
     def __init__(self, x, y, x2, y2, width=Level.LANE_WIDTH, color=Level.LANE_COLOR):
         super().__init__(x, y, math.dist((x, y), (x2, y2)), width, color)
 
-        self.direction = math.degrees(math.atan2(y2 - y, x2 - x))
+        self.direction = -1*math.degrees(math.atan2(y2 - y, x2 - x))
         self.center = ((x + x2) / 2, (y + y2) / 2)
 
         #figure out rotation and movement of rel_x and rel_y
