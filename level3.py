@@ -137,7 +137,7 @@ if __name__ == "__main__":
     # Set screen
     screen_width = 1920
     screen_height = 1080
-    screen = pygame.display.set_mode((screen_width, screen_height),pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((screen_width, screen_height),pygame.FULLSCREEN | pygame.SCALED)
     
     #calls the level_Three() Funcntion
     print(level_Three(screen, screen_width, screen_height))
