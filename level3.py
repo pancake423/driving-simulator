@@ -42,21 +42,22 @@ def level_Three(screen, screen_width, screen_height):
     
     #Create coordinates for the horizontal road
     fh_start_x = 0  
-    fh_end_x = 840
+    fh_end_x = 842
     fh_y = 540
 
-    sh_start_x = 1060
+    sh_start_x = 1057
     sh_end_x = 2160
     sh_y = 540
 
     #Coordinates for vertical roads
-    #R1
+    #R1 bottom road
     v_st_1 = 1485
-    v_end_1 = 650
+    v_end_1 = 646 #650
     x1 = 955
     
+    #top road
     v_st_2 = 0
-    v_end_2 = 430
+    v_end_2 = 432 #430
     x2 = 955
     
     
