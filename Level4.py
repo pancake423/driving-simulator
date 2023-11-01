@@ -20,8 +20,8 @@ def level_Four(screen, screen_width, screen_height):
     botCar.setTarget((-1000, topLaneY))
     
     
-    playerCar.setCollide(botGroup)
-    botCar.setCollide(playerGroup)
+    playerCar.setCollide([botGroup])
+    botCar.setCollide([playerGroup])
     
     clock = pygame.time.Clock()
     run = True

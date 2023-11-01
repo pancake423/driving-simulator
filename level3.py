@@ -30,8 +30,8 @@ def level_Three(screen, screen_width, screen_height):
     botGroup.add(botCar)
     botCar.setTarget((-1000, topLaneY))
     
-    playerCar.setCollide(botGroup)
-    botCar.setCollide(playerGroup)
+    playerCar.setCollide([botGroup])
+    botCar.setCollide([playerGroup])
 
     #displays level 6 on screen
     pygame.display.set_caption(levelNum)
@@ -110,10 +110,6 @@ def level_Three(screen, screen_width, screen_height):
         playerPos, botPos = playerCar.getPos(), botCar.getPos()
         playerX, playerY = playerPos
         botX, botY = botPos
-        
-        if not botTurned and botX - playerX < 450:
-            botCar.setTarget((playerX + 100, playerY), True)
-            botTurned = True
 
         # Update the display
         pygame.display.flip()

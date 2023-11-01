@@ -49,17 +49,55 @@ class AbstractCar(pygame.sprite.Sprite):
     def turn(self, dir):
         oldCenter = self.rect.center
         turnAmount = self.turnSpeed * abs(self.velocity)
+        snapBuffer = turnAmount
         
         if dir.lower() == "left":
             self.angle -= turnAmount
+            
         elif dir.lower() == "right":
             self.angle += turnAmount
         
         self.angle %= 360
         
+        
         self.setImage()
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=oldCenter)
+        
+    def snapTurn(self):
+        snapBuffer = 4 #Need to dial this in to make it work right
+        if (abs(self.velocity)*self.turnSpeed) > snapBuffer:
+            #Snap up
+            if self.angle < 270 + snapBuffer and self.angle > 270 - snapBuffer:
+                self.angle = 270 
+            
+            #Snap down
+            if self.angle < 90 + snapBuffer and self.angle > 90 - snapBuffer:
+                self.angle = 90  
+            
+            #Snap right
+            if self.angle < 0 + snapBuffer and self.angle > 0 - snapBuffer:
+                self.angle = 0
+                
+            #Snap left
+            if self.angle < 180 + snapBuffer and self.angle > 180 - snapBuffer:
+                self.angle = 180
+                
+            #Snap up-right
+            if self.angle < 315 + snapBuffer and self.angle > 315 - snapBuffer:
+                self.angle = 315
+                
+            #Snap down-right
+            if self.angle < 45 + snapBuffer and self.angle > 45 - snapBuffer:
+                self.angle = 45
+                
+            #Snap up-left
+            if self.angle < 225 + snapBuffer and self.angle > 225 - snapBuffer:
+                self.angle = 225
+                
+            #Snap down-left
+            if self.angle < 135 + snapBuffer and self.angle > 135 - snapBuffer:
+                self.angle = 135
         
     def move(self):
         delta_x = self.velocity * math.cos(math.radians(self.angle))
@@ -87,8 +125,8 @@ class AbstractCar(pygame.sprite.Sprite):
                     self.image = pygame.image.load("assets\\explosion.png")
                     self.image = pygame.transform.smoothscale(self.image, (self.length, self.length)).convert_alpha()
             
-    def setCollide(self, group):
-        self.collideGroups.append(group)
+    def setCollide(self, groups):
+        self.collideGroups = groups
         
     def isStopped(self):
         return self.stopped
@@ -126,6 +164,10 @@ class PlayerCar(AbstractCar):
                 self.turn("right")
             else:
                 self.turn("left")
+        if keys[pygame.K_RIGHT] == False and keys[pygame.K_d] == False:
+            self.snapTurn()
+        if keys[pygame.K_LEFT] == False and keys[pygame.K_a] == False:
+            self.snapTurn()
         if keys[pygame.K_SPACE]:
             self.brake()
     
@@ -277,7 +319,7 @@ class Pedestrian(pygame.sprite.Sprite):
     
 if __name__ == "__main__":
     pygame.init()
-    screen = pygame.display.set_mode((1080, 720), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
     pygame.display.set_caption("AI Car demo")
     
     BotCars = pygame.sprite.Group()
@@ -292,12 +334,9 @@ if __name__ == "__main__":
     guy = Pedestrian((500,200))
     Pedestrians.add(guy)
     
-    playerCar.setCollide(BotCars)
-    myCar.setCollide(player)
-    playerCar.setCollide(Pedestrians)
-    myCar.setCollide(Pedestrians)
-    guy.setCollide(BotCars)
-    guy.setCollide(player)
+    playerCar.setCollide([BotCars,Pedestrians])
+    myCar.setCollide([player,Pedestrians])
+    guy.setCollide([BotCars,player])
     
     # List of targets to hit before following user mouse
     myCar.addTargets([(700, 200), (600, 500), (200, 200), (600, 400)])

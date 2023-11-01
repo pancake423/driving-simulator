@@ -29,9 +29,9 @@ def levelFive(screen, screen_width, screen_height):
     botCar2.setTarget((screen_width + 100,screen_height/4 + 20))
     
     #Collisions
-    playerCar.setCollide(bots)
-    botCar1.setCollide(player)
-    botCar2.setCollide(player)
+    playerCar.setCollide([bots])
+    botCar1.setCollide([player])
+    botCar2.setCollide([player])
     
     clock = pygame.time.Clock()
     last_spawned = pygame.time.get_ticks() #initializing this for later
@@ -46,7 +46,7 @@ def levelFive(screen, screen_width, screen_height):
                 
         #If there's less than 5 bot cars, create a new one
         if len(bots.sprites()) < 5:
-            #wait 1 seconds between sopawning cars so they do't spawn on top of each other
+            #wait 1 second between spawning cars so they do't spawn on top of each other
             if (pygame.time.get_ticks() - last_spawned) > 1000:
                 #Divides the cars between both lanes of the road
                 if randint(0,1) == 1:
@@ -60,7 +60,7 @@ def levelFive(screen, screen_width, screen_height):
                 
                 bots.add(botCarNum)
                 botList.append(botCarNum)
-                botCarNum.setCollide(player)
+                botCarNum.setCollide([player])
             
         else:    
             #Deletes bots once they get to the right and recreates them on the left
