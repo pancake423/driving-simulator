@@ -42,7 +42,8 @@ def levelFive(screen, screen_width, screen_height):
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                run = False
+
                 
         #If there's less than 5 bot cars, create a new one
         if len(bots.sprites()) < 5:

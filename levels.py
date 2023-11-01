@@ -45,9 +45,11 @@ class Level:
     def add_diagonal_road(self, x1, y1, x2, y2):
         #road implementation supporting diagonals
         total_width = Level.LANE_WIDTH * 2 + Level.LINE_WIDTH * 9
-        slope = math.atan2(y2 - y1, x2 - x1)
+        slope = math.atan2(y2-y1, x2-x1)
+        print(slope)
         move_para = lambda x, y, dist: (x + math.cos(slope)*dist, y + math.sin(slope)*dist)
-        move_perp = lambda x, y, dist: (x + math.cos(slope + math.pi/2)*dist, y + math.sin(slope + math.pi/2)*dist)
+        def move_perp (x, y, dist): 
+            return (x + math.cos(slope + math.pi/2)*dist, y + math.sin(slope + math.pi/2)*dist)
 
         self.sub_layer.add(
             RoadLane(x1, y1, x2, y2, width=total_width)
@@ -145,7 +147,7 @@ class Level:
         collisions = []
         for lane in self.road_layer.sprites():
             if pygame.sprite.collide_mask(sprite, lane) != None:
-                collisions.append(self.lanes)
+                collisions.append(lane)
         return collisions
 
 
@@ -158,7 +160,7 @@ class RectSprite(pygame.sprite.Sprite):
         self.rel_x = x;
         self.rel_y = y;
 
-        self.image = pygame.Surface([width, height])
+        self.image = pygame.Surface([width, height], pygame.SRCALPHA)
         self.image.fill(color)
 
         self.rect = self.image.get_rect()

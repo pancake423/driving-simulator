@@ -47,5 +47,12 @@ if __name__ == "__main__":
     screen_height = 720
     screen = pygame.display.set_mode((screen_width, screen_height))
 
-    while level_One(screen, screen_width, screen_height):
+    level = level_One(screen, screen_width, screen_height)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+        level.draw(screen, 0, 0)
+        pygame.display.flip()
         pass  # The game loop will keep running until the game is closed
