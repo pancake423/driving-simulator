@@ -90,6 +90,8 @@ paused_level_screen = False
 #set end_state to False to control level end screen portion of game loop
 end_state = False
 
+botTurned = False
+
 cars_group = False
 
 #set amount of levels
@@ -224,7 +226,6 @@ if __name__ == "__main__":
             botLaneY = 0
             botLaneX = resW
             x_flip = False
-            botTurned = False
             match level_choice:
                 case 1:
                     topLaneY = (resH / 2) - 65
@@ -283,7 +284,6 @@ if __name__ == "__main__":
                         playerCar.setCollide([BotCars])
                         myCar.setCollide([player])
                         cars_group = True
-                        
 
                     myCar.setTarget((-1000, topLaneY))
                     screen.fill(Level.BG_COLOR)
@@ -409,6 +409,7 @@ if __name__ == "__main__":
                                 target_one = True
                                 target_two = False
                                 target_three = False
+                                botTurned = False
                                 if cars_group:
                                     player.remove(playerCar)
                                     BotCars.remove(myCar)
@@ -440,6 +441,7 @@ if __name__ == "__main__":
                                 target_one = True
                                 target_two = False
                                 target_three = False
+                                botTurned = False
                                 if cars_group:
                                     player.remove(playerCar)
                                     BotCars.remove(myCar)
@@ -466,6 +468,7 @@ if __name__ == "__main__":
                     target_one = True
                     target_two = False
                     target_three = False
+                    botTurned = False
                     paused_time = 0
                     if cars_group:
                         player.remove(playerCar)
@@ -484,6 +487,7 @@ if __name__ == "__main__":
                     target_one = True
                     target_two = False
                     target_three = False
+                    botTurned = False
                     paused_time = 0
                     if cars_group:
                         player.remove(playerCar)
