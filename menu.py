@@ -90,8 +90,6 @@ paused_level_screen = False
 #set end_state to False to control level end screen portion of game loop
 end_state = False
 
-botTurned = False
-
 cars_group = False
 
 #set amount of levels
@@ -182,6 +180,10 @@ if __name__ == "__main__":
     #initialize pygame
     pygame.init()
 
+    target_one = True
+    target_two = False
+    target_three = False
+
     #game loop runs unitl a quit condition is met
     while True:
 
@@ -210,6 +212,7 @@ if __name__ == "__main__":
                 if level_rect_list[i].collidepoint(mouse_pos):
                     pygame.draw.rect(screen, 'lawngreen', level_rect_list[i], 3)
 
+
         if start_screen:
 
             screen.fill(Level.BG_COLOR)
@@ -221,6 +224,7 @@ if __name__ == "__main__":
             botLaneY = 0
             botLaneX = resW
             x_flip = False
+            botTurned = False
             match level_choice:
                 case 1:
                     topLaneY = (resH / 2) - 65
@@ -228,6 +232,7 @@ if __name__ == "__main__":
                     botLaneY = (resH / 2) + 65
                     botLaneX = 80
                     x_flip = True
+
                     if level_list[level_choice - 1] == None:
                         level_list[level_choice - 1] = level_Tutorial(screen, resW, resH)
 
@@ -239,9 +244,26 @@ if __name__ == "__main__":
                         playerCar.setCollide([BotCars])
                         myCar.setCollide([player])
                         cars_group = True
+
+                    playerPos, botPos = playerCar.getPos(), myCar.getPos()
+                    playerX, playerY = playerPos
+                    botX, botY = botPos
+
+                    if target_one:
+                        myCar.setTarget(((resW / 2) - 107.5, botLaneY))
+                        if botX >= ((resW / 2) - 107.5):
+                            target_one = False
+                            target_two = True
+                    if target_two:
+                        myCar.setTarget(((resW / 2) + 65, botLaneY - 107.5))
+                        if botY >= (botLaneY - 107.5):
+                            target_two = False
+                            target_three = True
+                    if target_three:
+                        myCar.setTarget(((resW / 2) + 65, 0))
                         
                     screen.fill(Level.BG_COLOR)
-                    myCar.setTarget(((resW / 2) - 107.5, botLaneY))
+                    #myCar.addTargets(((resW / 2) - 107.5, botLaneY))
                 case 2:
                     screen.fill((255, 200, 100))
                 case 3:
@@ -261,6 +283,7 @@ if __name__ == "__main__":
                         playerCar.setCollide([BotCars])
                         myCar.setCollide([player])
                         cars_group = True
+                        
 
                     myCar.setTarget((-1000, topLaneY))
                     screen.fill(Level.BG_COLOR)
@@ -278,7 +301,7 @@ if __name__ == "__main__":
 
             player.update() 
             BotCars.update()
-            level_list[level_choice - 1].draw(screen, 0, 0)           
+            level_list[level_choice - 1].draw(screen, 0, 0)  
             BotCars.draw(screen)
             player.draw(screen)
             display_score()
@@ -383,6 +406,9 @@ if __name__ == "__main__":
                             if quit_title_rect.collidepoint(mouse_pos):
                                 pause_state = False
                                 title_state = True
+                                target_one = True
+                                target_two = False
+                                target_three = False
                                 if cars_group:
                                     player.remove(playerCar)
                                     BotCars.remove(myCar)
@@ -411,6 +437,9 @@ if __name__ == "__main__":
                                 pause_state = False
                                 title_state = True
                                 paused_level_screen = False
+                                target_one = True
+                                target_two = False
+                                target_three = False
                                 if cars_group:
                                     player.remove(playerCar)
                                     BotCars.remove(myCar)
@@ -434,6 +463,9 @@ if __name__ == "__main__":
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     play_state = True
                     end_state = False
+                    target_one = True
+                    target_two = False
+                    target_three = False
                     paused_time = 0
                     if cars_group:
                         player.remove(playerCar)
@@ -449,6 +481,9 @@ if __name__ == "__main__":
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     level_state = True
                     end_state = False
+                    target_one = True
+                    target_two = False
+                    target_three = False
                     paused_time = 0
                     if cars_group:
                         player.remove(playerCar)
