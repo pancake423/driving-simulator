@@ -144,7 +144,7 @@ class AbstractCar(pygame.sprite.Sprite):
         self.rect.center = pos
     
     def setAngle(self, angle):
-        self.angle = angle
+        self.angle = angle % 360
         self.setImage()
         
 class PlayerCar(AbstractCar):
