@@ -11,6 +11,8 @@ class Level:
 
     LANE_WIDTH = 100 #pixels
     LINE_WIDTH = 5 #pixels
+    STUB_ROAD_LEN = 200 #pixels
+    STOP_LINE_WIDTH = 25 #pixels
 
     def __init__(self, width, height):
         self.width = width
@@ -85,7 +87,6 @@ class Level:
                 width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
             )
         )
-        #TODO: lines and lanes
 
     def add_intersection(self, x, y):
         #x, y is the center of the intersection
@@ -107,6 +108,132 @@ class Level:
             RoadLane(sx + inner_lane, sy, sx + inner_lane, sy + width),
             RoadLane(sx + outer_lane, sy, sx + outer_lane, sy + width)
         )
+
+    def add_intersection_2(self, x, y):
+        #intersection is a square with a side length of 2*LANE_WIDTH + 3*LINE_WIDTH
+        #the stub roads have a length of STUB_ROAD_LEN on each side.
+        #total width/height: 2*LANE_WIDTH + 3*LINE_WIDTH + 2*STUB_ROAD_LEN
+        intersection_width = 2*Level.LANE_WIDTH + 3*Level.LINE_WIDTH + 2*Level.STUB_ROAD_LEN
+        road_width = 2*Level.LANE_WIDTH+9*Level.LINE_WIDTH;
+        self.sub_layer.add(
+            RoadLane(x - intersection_width/2, y, x + intersection_width/2, y, width=road_width),
+            RoadLane(x, y  - intersection_width/2, x, y + intersection_width/2, width=road_width)
+        )
+
+        self.top_layer.add(
+            #lines
+            RoadLane(
+                x - intersection_width/2, y + Level.LINE_WIDTH, 
+                x - intersection_width/2 + Level.STUB_ROAD_LEN, y + Level.LINE_WIDTH, 
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                x - intersection_width/2, y - Level.LINE_WIDTH, 
+                x - intersection_width/2 + Level.STUB_ROAD_LEN, y - Level.LINE_WIDTH, 
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                x + intersection_width/2, y + Level.LINE_WIDTH, 
+                x + intersection_width/2 - Level.STUB_ROAD_LEN, y + Level.LINE_WIDTH, 
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                x + intersection_width/2, y - Level.LINE_WIDTH, 
+                x + intersection_width/2 - Level.STUB_ROAD_LEN, y - Level.LINE_WIDTH, 
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                x - intersection_width/2, y + (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), 
+                x - intersection_width/2 + Level.STUB_ROAD_LEN, y + (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), 
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                x - intersection_width/2, y - (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), 
+                x - intersection_width/2 + Level.STUB_ROAD_LEN, y - (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), 
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                x + intersection_width/2, y + (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), 
+                x + intersection_width/2 - Level.STUB_ROAD_LEN, y + (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), 
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                x + intersection_width/2, y - (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), 
+                x + intersection_width/2 - Level.STUB_ROAD_LEN, y - (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), 
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                x + Level.LINE_WIDTH, y - intersection_width/2, 
+                x + Level.LINE_WIDTH, y - intersection_width/2 + Level.STUB_ROAD_LEN,  
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                x - Level.LINE_WIDTH, y - intersection_width/2,  
+                x - Level.LINE_WIDTH, y - intersection_width/2 + Level.STUB_ROAD_LEN,  
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                x + Level.LINE_WIDTH, y + intersection_width/2,  
+                x + Level.LINE_WIDTH, y + intersection_width/2 - Level.STUB_ROAD_LEN,  
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                x - Level.LINE_WIDTH, y + intersection_width/2, 
+                x - Level.LINE_WIDTH, y + intersection_width/2 - Level.STUB_ROAD_LEN, 
+                width=Level.LINE_WIDTH, color=Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                x + (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), y - intersection_width/2, 
+                x + (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), y - intersection_width/2 + Level.STUB_ROAD_LEN,  
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                x - (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), y - intersection_width/2,  
+                x - (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), y - intersection_width/2 + Level.STUB_ROAD_LEN,  
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                x + (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), y + intersection_width/2,  
+                x + (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), y + intersection_width/2 - Level.STUB_ROAD_LEN,  
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                x - (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), y + intersection_width/2,  
+                x - (Level.LINE_WIDTH*2 + Level.LANE_WIDTH), y + intersection_width/2 - Level.STUB_ROAD_LEN,  
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            #stop markers
+            RectSprite(
+                x - intersection_width/2 + Level.STUB_ROAD_LEN - Level.STOP_LINE_WIDTH,
+                y + Level.LINE_WIDTH*1.5,
+                Level.STOP_LINE_WIDTH,
+                Level.LANE_WIDTH,
+                Level.W_LINE_COLOR
+            ),
+            RectSprite(
+                x + intersection_width/2 - Level.STUB_ROAD_LEN,
+                y - Level.LINE_WIDTH*1.5 - Level.LANE_WIDTH,
+                Level.STOP_LINE_WIDTH,
+                Level.LANE_WIDTH,
+                Level.W_LINE_COLOR
+            ),
+            RectSprite(
+                x - Level.LINE_WIDTH*1.5 - Level.LANE_WIDTH,
+                y - intersection_width/2 + Level.STUB_ROAD_LEN - Level.STOP_LINE_WIDTH,
+                Level.LANE_WIDTH,
+                Level.STOP_LINE_WIDTH,
+                Level.W_LINE_COLOR
+            ),
+            RectSprite(
+                x + Level.LINE_WIDTH*1.5,
+                y + intersection_width/2 - Level.STUB_ROAD_LEN,
+                Level.LANE_WIDTH,
+                Level.STOP_LINE_WIDTH,
+                Level.W_LINE_COLOR
+            )
+        )
+
+
 
     def add_random_decorations(self,n):
         #adds n random decorations. Flowers, grass, rocks.
@@ -156,10 +283,10 @@ class Level:
 class RectSprite(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, color):
         super().__init__()
-        self.rel_x = x;
-        self.rel_y = y;
+        self.rel_x = x-1;
+        self.rel_y = y-1;
 
-        self.image = pygame.Surface([width, height], pygame.SRCALPHA)
+        self.image = pygame.Surface([width+2, height+2], pygame.SRCALPHA)
         self.image.fill(color)
 
         self.rect = self.image.get_rect()

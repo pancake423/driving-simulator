@@ -36,11 +36,7 @@ inter_x = screen_width // 2
 inter_y = screen_height // 2
 
 #call functions to add roads, intersections, etc
-level.add_horizontal_road(fh_start_x, fh_end_x, fh_y)
-level.add_horizontal_road(sh_start_x, sh_end_x, sh_y)
-level.add_vertical_road(x1, v_st_1, v_end_1)
-level.add_vertical_road(x2, v_st_2, v_end_2)
-level.add_intersection(inter_x, inter_y)
+level.add_intersection_2(inter_x, inter_y)
 
 # Main game loop
 running = True
