@@ -139,6 +139,13 @@ class AbstractCar(pygame.sprite.Sprite):
     
     def getPos(self):
         return self.rect.center
+    
+    def setPos(self, pos):
+        self.rect.center = pos
+    
+    def setAngle(self, angle):
+        self.angle = angle
+        self.setImage()
         
 class PlayerCar(AbstractCar):
     IMG = pygame.image.load("assets\\unicorn-car-blue.png")
@@ -326,10 +333,7 @@ class Pedestrian(pygame.sprite.Sprite):
         if self.hit == False:
             self.walk()
             
-            
-        
-        
-    
+              
 if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
@@ -353,8 +357,7 @@ if __name__ == "__main__":
     
     # List of targets to hit before following user mouse
     myCar.addTargets([(700, 200), (600, 500), (200, 200), (600, 400)])
-    
-    
+        
     clock = pygame.time.Clock()
     run = True
     while run:
