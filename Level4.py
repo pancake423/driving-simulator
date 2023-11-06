@@ -7,25 +7,23 @@ def level_Four(screen, screen_width, screen_height):
     level.add_horizontal_road(0, screen_width, screen_height / 2 - 53)
     level.add_random_decorations(30)
     
-    #topLaneY = screen_height / 2 - 110
-    #botLaneY = screen_height / 2 + 10
+    topLaneY = screen_height / 2 - 110
+    botLaneY = screen_height / 2 + 10
     
-    #playerCar = PlayerCar((80, botLaneY))
-    #playerGroup = pygame.sprite.GroupSingle()
-    #playerGroup.add(playerCar)
+    playerCar = PlayerCar((80, botLaneY))
+    playerGroup = pygame.sprite.GroupSingle()
+    playerGroup.add(playerCar)
     
-    #botCar = BotCar((screen_width, topLaneY), 180)
-    #botGroup = pygame.sprite.Group()
-    #botGroup.add(botCar)
-    #botCar.setTarget((-1000, topLaneY))
+    botCar = BotCar((screen_width, topLaneY), 180)
+    botGroup = pygame.sprite.Group()
+    botGroup.add(botCar)
+    botCar.setTarget((-1000, topLaneY))
     
     
-    #playerCar.setCollide([botGroup])
-    #botCar.setCollide([playerGroup])
-
-    return level #, playerCar, botCar
+    playerCar.setCollide([botGroup])
+    botCar.setCollide([playerGroup])
     
-    """clock = pygame.time.Clock()
+    clock = pygame.time.Clock()
     run = True
     botTurned = False
     while run:
@@ -66,4 +64,6 @@ if __name__ == "__main__":
     
     print(level_Four(screen, screen_width, screen_height))
     pygame.quit()
-"""
+    
+    
+    
