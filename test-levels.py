@@ -36,7 +36,9 @@ inter_x = screen_width // 2
 inter_y = screen_height // 2
 
 #call functions to add roads, intersections, etc
-level.add_intersection_2(inter_x, inter_y)
+level.add_4_way_stop(inter_x, inter_y)
+
+level.add_random_decorations(30)
 
 # Main game loop
 running = True

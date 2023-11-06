@@ -233,6 +233,19 @@ class Level:
             )
         )
 
+    def add_4_way_stop(self, x, y):
+        #same dimensions as intersection_2
+        self.add_intersection_2(x, y)
+        sign_dist = Level.LANE_WIDTH + 7.5*Level.LINE_WIDTH
+        x_trans = x - 30 #hardcoded half of stop sign image width because I am a terrible programmer
+        y_trans = y -98 #hardcoded entire stop sign height (see above) ^
+        self.top_layer.add(
+            ImageSprite(x_trans - sign_dist, y_trans - sign_dist, os.path.join("assets", "stop-sign.png")),
+            ImageSprite(x_trans - sign_dist, y_trans + sign_dist, os.path.join("assets", "stop-sign.png")),
+            ImageSprite(x_trans + sign_dist, y_trans - sign_dist, os.path.join("assets", "stop-sign.png")),
+            ImageSprite(x_trans + sign_dist, y_trans + sign_dist, os.path.join("assets", "stop-sign.png"))
+        )
+
 
 
     def add_random_decorations(self,n):
