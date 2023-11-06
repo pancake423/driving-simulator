@@ -189,10 +189,9 @@ class BotCar(AbstractCar):
     
     def __init__(self, startPos, angle = 0):
         super().__init__(startPos, angle)
-        self.target = (self.rect.center)
+        self.target = (self.rect.center, True)
         self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
         self.crash_sound.set_volume(0.3)
-        self.stopTarget = False
         self.nextTargets = []
         self.targetBuffer = 30
         self.stopSigns = []
@@ -200,7 +199,7 @@ class BotCar(AbstractCar):
     #Move the bot towards the target
     def bot_move(self):
         x, y = self.rect.center
-        targetX, targetY = self.target
+        targetX, targetY = self.target[0]
         dX, dY = targetX - x, targetY - y
         distance = math.sqrt(dX**2 + dY**2)
         targetAngle = math.degrees(math.atan2(dY, dX)) % 360
@@ -214,7 +213,7 @@ class BotCar(AbstractCar):
                 self.turn("left")
                 
         # Change speed
-        if self.stopTarget:
+        if self.target[1]:
             targetSpeed = (0.015*distance)**1.6
         else:
             targetSpeed = float("inf")
@@ -232,9 +231,8 @@ class BotCar(AbstractCar):
         else:
             self.brake()
     
-    def setTarget(self, target, stopAtTarget=False):
-        self.target = target
-        self.stopTarget = stopAtTarget # True to stop, False to keep going
+    def setTarget(self, target):
+        self.target = target # Target should be in format ((x, y), True/False (Stop or Not)), eg ((50, 50), True) to stop at (50, 50)
         
     def addTargets(self, targets):
         for target in targets:
@@ -243,7 +241,7 @@ class BotCar(AbstractCar):
     # Returns True when near target and ready for next one
     def newTarget(self):
         x, y = self.rect.center
-        targetX, targetY = self.target
+        targetX, targetY = self.target[0]
         dX, dY = targetX - x, targetY - y
         distance = math.sqrt(dX**2 + dY**2)
         
@@ -356,7 +354,7 @@ if __name__ == "__main__":
     guy.setCollide([BotCars,player])
     
     # List of targets to hit before following user mouse
-    myCar.addTargets([(700, 200), (600, 500), (200, 200), (600, 400)])
+    myCar.addTargets([((700, 200), False), ((600, 500), False), ((200, 200), False), ((600, 400), False)])
         
     clock = pygame.time.Clock()
     run = True
@@ -365,7 +363,7 @@ if __name__ == "__main__":
         screen.fill((50, 200, 50))
         guy.setTarget(pygame.mouse.get_pos())
         if myCar.queuedTargets() == 0:
-            myCar.setTarget(pygame.mouse.get_pos(), True) # True to stop at mouse, False to continue
+            myCar.setTarget((pygame.mouse.get_pos(), True)) # True to stop at mouse, False to continue
         BotCars.update()
         player.update()
         Pedestrians.update()
