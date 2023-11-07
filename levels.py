@@ -263,12 +263,13 @@ class Level:
 
 
 
+
     def add_random_decorations(self,n):
         #adds n random decorations. Flowers, grass, rocks.
         DECORATION_PATHS = [
             os.path.join("assets", "flower-blue.png"),
             os.path.join("assets", "flower-white.png"),
-            #os.path.join("assets", "pebbles.png"),
+            os.path.join("assets", "grass.png"),
         ]
         self._set_translate(self.x, self.y)
         for _ in range(n):
