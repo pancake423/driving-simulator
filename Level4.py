@@ -17,7 +17,7 @@ def level_Four(screen, screen_width, screen_height):
     botCar = BotCar((screen_width, topLaneY), 180)
     botGroup = pygame.sprite.Group()
     botGroup.add(botCar)
-    botCar.setTarget((-1000, topLaneY))
+    botCar.setTarget(((-1000, topLaneY), False))
     
     
     playerCar.setCollide([botGroup])
@@ -45,8 +45,10 @@ def level_Four(screen, screen_width, screen_height):
         botX, botY = botPos
         
         if not botTurned and botX - playerX < 450:
-            botCar.setTarget((playerX + 100, playerY), True)
+            botCar.setTarget(((playerX + 100, playerY), True))
             botTurned = True
+            
+        print(level.get_targets(playerCar))
           
         pygame.display.flip()
         
@@ -64,6 +66,3 @@ if __name__ == "__main__":
     
     print(level_Four(screen, screen_width, screen_height))
     pygame.quit()
-    
-    
-    
