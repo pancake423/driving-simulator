@@ -21,11 +21,11 @@ def level_Three(screen, screen_width, screen_height):
     topLaneY = screen_height / 2 - 110
     botLaneY = screen_height / 2 + 10
     
-    playerCar = PlayerCar((80, botLaneY))
+    playerCar = PlayerCar((80, 600))
     playerGroup = pygame.sprite.GroupSingle()
     playerGroup.add(playerCar)
     
-    botCar = BotCar((screen_width, topLaneY), 180)
+    botCar = BotCar((screen_width, topLaneY), 130)
     botGroup = pygame.sprite.Group()
     botGroup.add(botCar)
     botCar.setTarget((-1000, topLaneY))
