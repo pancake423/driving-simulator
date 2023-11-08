@@ -10,7 +10,7 @@ def levelFive(screen, screen_width, screen_height):
     #Level Elements
     level = Level(screen_width, screen_height)
     level.add_horizontal_road(0,screen_width,screen_height/3)
-    #level.add_diagonal_road(0,screen_height,screen_width/2,screen_height/3)
+    level.add_diagonal_road(0,screen_height,screen_width/2,screen_height/3)
     level.add_random_decorations(20)
     
     #Player
@@ -25,8 +25,8 @@ def levelFive(screen, screen_width, screen_height):
     bots.add(botCar1)
     bots.add(botCar2)
     botList = [botCar1, botCar2]
-    botCar1.setTarget((screen_width + 100,screen_height/3 + 50))
-    botCar2.setTarget((screen_width + 100,screen_height/4 + 20))
+    botCar1.setTarget(((screen_width + 100,screen_height/3 + 50),False))
+    botCar2.setTarget(((screen_width + 100,screen_height/4 + 20),False))
     
     #Collisions
     playerCar.setCollide([bots])
@@ -52,10 +52,10 @@ def levelFive(screen, screen_width, screen_height):
                 #Divides the cars between both lanes of the road
                 if randint(0,1) == 1:
                     botCarNum = BotCar((-50,screen_height/3 + 50))
-                    botCarNum.setTarget((screen_width + 100,screen_height/3 + 50))
+                    botCarNum.setTarget(((screen_width + 100,screen_height/3 + 50),False))
                 else:
                     botCarNum = BotCar((-50,screen_height/4 + 20))
-                    botCarNum.setTarget((screen_width + 100,screen_height/4 + 20))
+                    botCarNum.setTarget(((screen_width + 100,screen_height/4 + 20),False))
                 
                 last_spawned = pygame.time.get_ticks()
                 

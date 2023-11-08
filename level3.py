@@ -77,7 +77,7 @@ def level_Three(screen, screen_width, screen_height):
     #Adds stop sign
     stopSign= pygame.image.load('assets/NewTempStop.png')
     stopSign = pygame.transform.smoothscale(stopSign,(60, 60)).convert_alpha()
-
+    stopSignCoords = [(760, 670), (1090, 670), (1090, 350), (760,350)]
     # Main game loop
     clock = pygame.time.Clock()
     running = True
@@ -108,7 +108,9 @@ def level_Three(screen, screen_width, screen_height):
         playerGroup.draw(screen)
         botGroup.draw(screen)
         
+        botCar.checkStopSign(stopSignCoords)
         playerPos, botPos = playerCar.getPos(), botCar.getPos()
+        botCar.update()
         playerX, playerY = playerPos
         botX, botY = botPos
 
