@@ -11,34 +11,6 @@ def level_Three(screen, screen_width, screen_height):
 
     #Initialize font
     pygame.font.init()
-
-    #font type
-    fontType = "fonts/Get Now.ttf"
-    levelFont = pygame.font.Font(fontType, 40)
-    level_surf = levelFont.render(levelNum, True, "red")
-    level_rect = level_surf.get_rect(topright = (screen_width - 20, 20))
-    
-    topLaneY = screen_height / 2 - 110
-    botLaneY = screen_height / 2 + 10
-    
-    playerCar = PlayerCar((80, 600))
-    playerGroup = pygame.sprite.GroupSingle()
-    playerGroup.add(playerCar)
-    
-    botCar = BotCar((screen_width, topLaneY), 130)
-    botGroup = pygame.sprite.Group()
-    botGroup.add(botCar)
-    botCar.setTarget((-1000, topLaneY))
-    
-    playerCar.setCollide([botGroup])
-    botCar.setCollide([playerGroup])
-
-    #displays level 6 on screen
-    pygame.display.set_caption(levelNum)
-    
-    #create a level instance
-    level = Level(screen_width, screen_height)
-    
     
     #Create coordinates for the horizontal road
     fh_start_x = 0  
@@ -64,6 +36,46 @@ def level_Three(screen, screen_width, screen_height):
     # coordinates for intersection
     inter_x = screen_width // 2.02
     inter_y = screen_height // 2
+
+    #font type
+    fontType = "fonts/Get Now.ttf"
+    levelFont = pygame.font.Font(fontType, 40)
+    level_surf = levelFont.render(levelNum, True, "red")
+    level_rect = level_surf.get_rect(topright = (screen_width - 20, 20))
+    
+    topLaneY = screen_height / 2 - 110
+    botLaneY = screen_height / 2 + 10
+    
+    playerCar = PlayerCar((80, 600))
+    playerGroup = pygame.sprite.GroupSingle()
+    playerGroup.add(playerCar)
+    
+    botCar = BotCar((screen_width, topLaneY + 50), 180)
+    botCar2 = BotCar((x1 - 50, 50), 90)
+    botCar3 = BotCar((x2 + 50, screen_height - 50), 270)
+    
+    botGroup = pygame.sprite.Group()
+    
+    botGroup.add(botCar)
+    botGroup.add(botCar2)
+    botGroup.add(botCar3)
+    
+    botCar.setTarget(((1150, topLaneY + 50), True))
+    botCar2.setTarget(((900, topLaneY - 60), True))
+    botCar3.setTarget(((1000, topLaneY + 270), True))
+    
+    playerCar.setCollide([botGroup])
+    botCar.setCollide([playerGroup])
+    botCar2.setCollide([playerGroup])
+    botCar3.setCollide([playerGroup])
+
+    #displays level 6 on screen
+    pygame.display.set_caption(levelNum)
+    
+    #create a level instance
+    level = Level(screen_width, screen_height)
+    
+    
     
     #call functions to add roads, intersections, etc
     level.add_horizontal_road(fh_start_x, fh_end_x, fh_y)
@@ -75,7 +87,7 @@ def level_Three(screen, screen_width, screen_height):
     
     
     #Adds stop sign
-    stopSign= pygame.image.load('assets/NewTempStop.png')
+    stopSign= pygame.image.load('assets/stop-sign.png')
     stopSign = pygame.transform.smoothscale(stopSign,(60, 60)).convert_alpha()
     stopSignCoords = [(760, 670), (1090, 670), (1090, 350), (760,350)]
     # Main game loop
