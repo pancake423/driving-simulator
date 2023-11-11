@@ -46,9 +46,9 @@ class AbstractCar(pygame.sprite.Sprite):
             self.velocity += self.acceleration
             self.velocity = min(0, self.velocity)
         
-    def turn(self, dir):
+    def turn(self, dir, scale = 1):
         oldCenter = self.rect.center
-        turnAmount = self.turnSpeed * abs(self.velocity)
+        turnAmount = self.turnSpeed * abs(self.velocity) * scale
         snapBuffer = turnAmount
         
         if dir.lower() == "left":
@@ -189,12 +189,12 @@ class PlayerCar(AbstractCar):
             
     def autoTurn(self):
         angleInterval = self.angle % 45
-        buffer = 5
+        buffer = 1
         
-        if angleInterval - 45/2 > buffer:
-            self.turn("right")
-        elif angleInterval - 45/2 <= -buffer:
-            self.turn("left")
+        if angleInterval > 45/2 and angleInterval < 45 - buffer:
+            self.turn("right", 0.4)
+        elif angleInterval <= 45/2 and angleInterval > buffer:
+            self.turn("left", 0.4)
     
     def update(self):
         self.checkCollison()
