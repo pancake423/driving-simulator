@@ -46,9 +46,9 @@ class AbstractCar(pygame.sprite.Sprite):
             self.velocity += self.acceleration
             self.velocity = min(0, self.velocity)
         
-    def turn(self, dir):
+    def turn(self, dir, scale = 1):
         oldCenter = self.rect.center
-        turnAmount = self.turnSpeed * abs(self.velocity)
+        turnAmount = self.turnSpeed * abs(self.velocity) * scale
         snapBuffer = turnAmount
         
         if dir.lower() == "left":
@@ -56,14 +56,13 @@ class AbstractCar(pygame.sprite.Sprite):
             
         elif dir.lower() == "right":
             self.angle += turnAmount
-        
+              
         self.angle %= 360
-        
         
         self.setImage()
         self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=oldCenter)
-        
+        self.rect = self.image.get_rect(center=oldCenter)        
+    
     def snapTurn(self):
         snapBuffer = 4 #Need to dial this in to make it work right
         if (abs(self.velocity)*self.turnSpeed) > snapBuffer:
@@ -156,6 +155,7 @@ class PlayerCar(AbstractCar):
         self.crash_sound.set_volume(0.3)
         
     def player_input(self):
+        turned = False
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             self.accelerate()
@@ -166,17 +166,35 @@ class PlayerCar(AbstractCar):
                 self.turn("left")
             else:
                 self.turn("right")
+            turned = True
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             if self.velocity > 0:
                 self.turn("right")
             else:
                 self.turn("left")
+            turned = True
+            
+        """
         if keys[pygame.K_RIGHT] == False and keys[pygame.K_d] == False:
             self.snapTurn()
         if keys[pygame.K_LEFT] == False and keys[pygame.K_a] == False:
             self.snapTurn()
+        """
+        
+        if not turned:
+            self.autoTurn()
+        
         if keys[pygame.K_SPACE]:
             self.brake()
+            
+    def autoTurn(self):
+        angleInterval = self.angle % 45
+        buffer = 1
+        
+        if angleInterval > 45/2 and angleInterval < 45 - buffer:
+            self.turn("right", 0.4)
+        elif angleInterval <= 45/2 and angleInterval > buffer:
+            self.turn("left", 0.4)
     
     def update(self):
         self.checkCollison()
