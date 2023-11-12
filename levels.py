@@ -13,6 +13,7 @@ class Level:
     LINE_WIDTH = 5 #pixels
     STUB_ROAD_LEN = 200 #pixels
     STOP_LINE_WIDTH = 25 #pixels
+    DASH_LEN = 30
 
     def __init__(self, width, height):
         self.width = width
@@ -261,6 +262,80 @@ class Level:
             ImageSprite(x_trans + sign_dist, y_trans + sign_dist, path)
         )
 
+    def add_dashed_line(self, x1, y1, x2, y2, color):
+        angle = math.atan2(y2 - y1, x2 - x1)
+        length = math.floor(math.dist((x1, y1), (x2, y2)))
+        for pos in range(0, length, Level.DASH_LEN*2):
+            self.top_layer.add(
+                RoadLane(
+                    x1 + pos * math.cos(angle), y1 + pos * math.sin(angle),
+                    x1 + (pos + Level.DASH_LEN) * math.cos(angle), y1 + (pos + Level.DASH_LEN) * math.sin(angle),
+                    Level.LINE_WIDTH, color
+                )
+            )
+
+    def add_4_lane_divided(self, x1, y1, x2, y2):
+        #each side is as wide as a two lane road, plus a 1/2 lane width median.
+        side_width = Level.LANE_WIDTH*2 + Level.LINE_WIDTH*7
+        slope = math.atan2(y2-y1, x2-x1)
+        def move_perp (x, y, dist): 
+            return (x + math.cos(slope + math.pi/2)*dist, y + math.sin(slope + math.pi/2)*dist)
+
+        side_1 = (
+            *move_perp(x1, y1, side_width/-2 + Level.LANE_WIDTH/-4), 
+            *move_perp(x2, y2, side_width/-2 + Level.LANE_WIDTH/-4)
+        )
+        side_2 = (
+            *move_perp(x1, y1, side_width/2 + Level.LANE_WIDTH/4), 
+            *move_perp(x2, y2, side_width/2 + Level.LANE_WIDTH/4)
+        )
+        self.sub_layer.add(
+            RoadLane(*side_1, side_width),
+            RoadLane(*side_2, side_width)
+        )
+        self.add_dashed_line(*side_1, Level.W_LINE_COLOR)
+        self.add_dashed_line(*side_2, Level.W_LINE_COLOR)
+        self.top_layer.add(
+            RoadLane(
+                *move_perp(side_1[0], side_1[1], Level.LANE_WIDTH + Level.LINE_WIDTH),
+                *move_perp(side_1[2], side_1[3], Level.LANE_WIDTH + Level.LINE_WIDTH),
+                Level.LINE_WIDTH, Level.Y_LINE_COLOR
+            ),
+            RoadLane(
+                *move_perp(side_1[0], side_1[1], -Level.LANE_WIDTH - Level.LINE_WIDTH),
+                *move_perp(side_1[2], side_1[3], -Level.LANE_WIDTH - Level.LINE_WIDTH),
+                Level.LINE_WIDTH, Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                *move_perp(side_2[0], side_2[1], Level.LANE_WIDTH + Level.LINE_WIDTH),
+                *move_perp(side_2[2], side_2[3], Level.LANE_WIDTH + Level.LINE_WIDTH),
+                Level.LINE_WIDTH, Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                *move_perp(side_2[0], side_2[1], -Level.LANE_WIDTH - Level.LINE_WIDTH),
+                *move_perp(side_2[2], side_2[3], -Level.LANE_WIDTH - Level.LINE_WIDTH),
+                Level.LINE_WIDTH, Level.Y_LINE_COLOR
+            )
+        )
+        self.road_layer.add(
+            RoadLane(
+                *move_perp(side_2[0], side_2[1], (Level.LANE_WIDTH + Level.LINE_WIDTH)/2),
+                *move_perp(side_2[2], side_2[3], (Level.LANE_WIDTH + Level.LINE_WIDTH)/2)
+            ),
+            RoadLane(
+                *move_perp(side_2[0], side_2[1], (Level.LANE_WIDTH + Level.LINE_WIDTH)/-2),
+                *move_perp(side_2[2], side_2[3], (Level.LANE_WIDTH + Level.LINE_WIDTH)/-2)
+            ),
+            RoadLane(
+                *move_perp(side_1[2], side_1[3], (Level.LANE_WIDTH + Level.LINE_WIDTH)/2),
+                *move_perp(side_1[0], side_1[1], (Level.LANE_WIDTH + Level.LINE_WIDTH)/2)
+            ),
+            RoadLane(
+                *move_perp(side_1[2], side_1[3], (Level.LANE_WIDTH + Level.LINE_WIDTH)/-2),
+                *move_perp(side_1[0], side_1[1], (Level.LANE_WIDTH + Level.LINE_WIDTH)/-2)
+            ),
+        )
+
 
 
 
@@ -383,8 +458,7 @@ class StopZone(RoadLane):
         super().__init__(x, y, x2, y2)
         self.target_points = [
             (x, y, False),
-            self.center,
+            (*self.center, True),
             (x2, y2, False)
         ]
         self.can_go = False
-
