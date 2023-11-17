@@ -13,7 +13,7 @@ class Level:
     LINE_WIDTH = 5 #pixels
     STUB_ROAD_LEN = 200 #pixels
     STOP_LINE_WIDTH = 25 #pixels
-    DASH_LEN = 30
+    DASH_LEN = 20
 
     def __init__(self, width, height):
         self.width = width
@@ -262,10 +262,10 @@ class Level:
             ImageSprite(x_trans + sign_dist, y_trans + sign_dist, path)
         )
 
-    def add_dashed_line(self, x1, y1, x2, y2, color):
+    def add_dashed_line(self, x1, y1, x2, y2, color, gap=0):
         angle = math.atan2(y2 - y1, x2 - x1)
         length = math.floor(math.dist((x1, y1), (x2, y2)))
-        for pos in range(0, length, Level.DASH_LEN*2):
+        for pos in range(Level.DASH_LEN*gap, length-Level.DASH_LEN*gap, Level.DASH_LEN*2):
             self.top_layer.add(
                 RoadLane(
                     x1 + pos * math.cos(angle), y1 + pos * math.sin(angle),
@@ -274,8 +274,9 @@ class Level:
                 )
             )
 
-    def add_4_lane_divided(self, x1, y1, x2, y2):
+    def add_4_lane_divided(self, x1, y1, x2, y2, or_mods=False):
         #each side is as wide as a two lane road, plus a 1/2 lane width median.
+        #or_mods enables a set of modifications that need to exist to add an on-ramp.
         side_width = Level.LANE_WIDTH*2 + Level.LINE_WIDTH*7
         slope = math.atan2(y2-y1, x2-x1)
         def move_perp (x, y, dist): 
@@ -307,21 +308,12 @@ class Level:
                 Level.LINE_WIDTH, Level.W_LINE_COLOR
             ),
             RoadLane(
-                *move_perp(side_2[0], side_2[1], Level.LANE_WIDTH + Level.LINE_WIDTH),
-                *move_perp(side_2[2], side_2[3], Level.LANE_WIDTH + Level.LINE_WIDTH),
-                Level.LINE_WIDTH, Level.W_LINE_COLOR
-            ),
-            RoadLane(
                 *move_perp(side_2[0], side_2[1], -Level.LANE_WIDTH - Level.LINE_WIDTH),
                 *move_perp(side_2[2], side_2[3], -Level.LANE_WIDTH - Level.LINE_WIDTH),
                 Level.LINE_WIDTH, Level.Y_LINE_COLOR
             )
         )
         self.road_layer.add(
-            RoadLane(
-                *move_perp(side_2[0], side_2[1], (Level.LANE_WIDTH + Level.LINE_WIDTH)/2),
-                *move_perp(side_2[2], side_2[3], (Level.LANE_WIDTH + Level.LINE_WIDTH)/2)
-            ),
             RoadLane(
                 *move_perp(side_2[0], side_2[1], (Level.LANE_WIDTH + Level.LINE_WIDTH)/-2),
                 *move_perp(side_2[2], side_2[3], (Level.LANE_WIDTH + Level.LINE_WIDTH)/-2)
@@ -335,7 +327,89 @@ class Level:
                 *move_perp(side_1[0], side_1[1], (Level.LANE_WIDTH + Level.LINE_WIDTH)/-2)
             ),
         )
+        if not or_mods:
+            self.top_layer.add(
+                RoadLane(
+                    *move_perp(side_2[0], side_2[1], Level.LANE_WIDTH + Level.LINE_WIDTH),
+                    *move_perp(side_2[2], side_2[3], Level.LANE_WIDTH + Level.LINE_WIDTH),
+                    Level.LINE_WIDTH, Level.W_LINE_COLOR
+                )
+            )
+            self.road_layer.add(
+                RoadLane(
+                    *move_perp(side_2[0], side_2[1], (Level.LANE_WIDTH + Level.LINE_WIDTH)/2),
+                    *move_perp(side_2[2], side_2[3], (Level.LANE_WIDTH + Level.LINE_WIDTH)/2)
+                ),
+            )
 
+    def add_4_lane_with_on_ramp(self, x1, y1, x2, y2, ramp_x, ramp_y, join_loc = 0.5):
+        '''
+        adds a 4-lane divided highway with an on-ramp to the level.
+
+        (x1, y1) to (x2, y2) is the span of the road
+        (ramp_x, ramp_y) is the starting point of the on-ramp
+        join_loc is the fractional distance along the road (from 0 to 1) where the on-ramp joins the main road.
+        '''
+        road_angle = math.atan2(y2 - y1, x2 - x1)
+        def move_perp (x, y, dist, theta=road_angle): 
+            return (x + math.cos(theta + math.pi/2)*dist, y + math.sin(theta + math.pi/2)*dist)
+
+        def move_para (x, y, dist, theta): 
+            return (x + math.cos(theta)*dist, y + math.sin(theta)*dist)
+
+        self.add_4_lane_divided(x1, y1, x2, y2, True)
+
+        join_point = (x1 + (x2 - x1) * join_loc, y1 + (y2 - y1) * join_loc)
+
+        ramp_end = move_perp(*join_point, Level.LANE_WIDTH*2.25 + Level.LINE_WIDTH*5)
+        or_length = math.dist((ramp_x, ramp_y), ramp_end)
+        or_angle = math.atan2(ramp_end[1] - ramp_y, ramp_end[0] - ramp_x)
+        ramp_intersect_width = abs(Level.LANE_WIDTH / (2 * math.sin(or_angle - road_angle)))
+        self.sub_layer.add(
+            RoadLane(
+                ramp_x, ramp_y, *move_para(*ramp_end, ramp_intersect_width, or_angle),
+                Level.LANE_WIDTH + 6*Level.LINE_WIDTH
+            )
+        )
+        self.road_layer.add(
+            RoadLane(ramp_x, ramp_y, *ramp_end),
+            RoadLane(
+                    *move_perp(x1, y1, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2),
+                    *move_perp(*join_point, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2)
+            ),
+            RoadLane(
+                    *move_perp(*join_point, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2),
+                    *move_perp(x2, y2, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2)
+            ),
+        )
+
+        self.top_layer.add(
+            RoadLane(
+                *move_para(*ramp_end, ramp_intersect_width, road_angle),
+                *move_perp(ramp_x, ramp_y, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2, or_angle),
+                Level.LINE_WIDTH, Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                *move_para(*ramp_end, -1*ramp_intersect_width, road_angle),
+                *move_perp(ramp_x, ramp_y, (Level.LANE_WIDTH + Level.LINE_WIDTH)/-2, or_angle),
+                Level.LINE_WIDTH, Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                *move_para(*ramp_end, ramp_intersect_width, road_angle),
+                *move_perp(x2, y2, Level.LANE_WIDTH*2.25 + Level.LINE_WIDTH*5),
+                Level.LINE_WIDTH, Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                *move_para(*ramp_end, -1*ramp_intersect_width, road_angle),
+                *move_perp(x1, y1, Level.LANE_WIDTH*2.25 + Level.LINE_WIDTH*5),
+                Level.LINE_WIDTH, Level.W_LINE_COLOR
+            )
+        )
+        self.add_dashed_line(
+            *move_para(*ramp_end, -1*ramp_intersect_width, road_angle),
+            *move_para(*ramp_end, ramp_intersect_width, road_angle),
+            Level.W_LINE_COLOR, gap=1
+        )
 
 
 
