@@ -31,11 +31,11 @@ v_end_2 = 252.5
 x2 = 540
 
 # coordinates for intersection
-inter_x = screen_width // 3
-inter_y = screen_height // 3.5
+inter_x = screen_width // 2
+inter_y = screen_height // 2
 
 #call functions to add roads, intersections, etc
-level.add_4_lane_with_on_ramp(0, inter_y, screen_width, inter_y, 0, screen_height, 0.8)
+level.add_t_intersection(inter_x, inter_y)
 
 level.add_random_decorations(60)
 

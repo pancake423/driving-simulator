@@ -432,9 +432,80 @@ class Level:
             if pygame.sprite.spritecollideany(img, self.sub_layer) == None:
                 self.sub_layer.add(img)
 
+    def add_t_intersection(self, x, y, entrance="bottom"):
+        '''
+        Adds a T intersection to the current level centered at (x, y).
+
+        'entrance' controls the orientation of the intersection.
+        top -> the main road is horizontal, with the entrance on top.
+        bottom -> the main road is horizontal, with the entrance on the bottom.
+        left -> the main road is vertical, with the entrance on the left.
+        right -> the main road is vertical, with the entrance or the left.
+
+        the intersection itself has a width of 2*LANE_WIDTH + 3*LINE_WIDTH px.
+        the stub roads coming out of the intersection have a length of STUB_ROAD_LEN.
+        '''
+
+        theta = 0;
+        if entrance == "bottom":
+            theta = math.pi
+        elif entrance == "left":
+            theta = math.pi/-2
+        elif entrance == "right":
+            theta = math.pi/2
+
+        intersection_size = Level.LANE_WIDTH + Level.LINE_WIDTH * 1.5
+
+        step = lambda x, y, dir, dist: (x + math.cos(dir)*dist, y + math.sin(dir)*dist)
+
+        self.add_diagonal_road(
+            *step(x, y, theta, intersection_size),
+            *step(x, y, theta, intersection_size + Level.STUB_ROAD_LEN)
+        )
+        self.add_diagonal_road(
+            *step(x, y, theta, -intersection_size),
+            *step(x, y, theta, -intersection_size - Level.STUB_ROAD_LEN)
+        )
+        self.add_diagonal_road(
+            *step(x, y, theta + math.pi/2, -intersection_size),
+            *step(x, y, theta + math.pi/2, -intersection_size - Level.STUB_ROAD_LEN)
+        )
+
+        self.sub_layer.add(
+            RoadLane(
+                *step(x, y, theta, -intersection_size),
+                *step(x, y, theta, intersection_size),
+                width=intersection_size*2 + 6*Level.LINE_WIDTH
+            )
+        )
+        top_line = step(x, y, theta + math.pi/2, intersection_size + Level.LINE_WIDTH/2)
+        bottom_line = step(x, y, theta - math.pi/2, intersection_size + Level.STOP_LINE_WIDTH/2)
+        
+        sign_dist = (Level.LANE_WIDTH + 7.5*Level.LINE_WIDTH) * math.sqrt(2)
+        x_trans = x - 30 #hardcoded half of stop sign image width because I am a terrible programmer
+        y_trans = y - 98 #hardcoded entire stop sign height (see above) ^
+        path = os.path.join("assets", "stop-sign.png")
+        
+        self.top_layer.add(
+            RoadLane(
+                *step(*top_line, theta, -intersection_size),
+                *step(*top_line, theta, intersection_size),
+                width=Level.LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            RoadLane(
+                *step(*bottom_line, theta, Level.LINE_WIDTH*-1.5),
+                *step(*bottom_line, theta, Level.LINE_WIDTH*-1.5 - Level.LANE_WIDTH),
+                width=Level.STOP_LINE_WIDTH, color=Level.W_LINE_COLOR
+            ),
+            ImageSprite(*step(x_trans, y_trans, theta - math.pi*0.75, sign_dist), path)
+        )
+
+
+
     def join_road_paths(self):
         #searches for road lanes that are connected and automatically stitches their paths together
         #ignores any roads that already have a connection set for nextTarget
+        #is this method needed?
         pass
 
     #internal method used to set the translation of all sprites relative to their starting position.
