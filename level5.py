@@ -81,8 +81,12 @@ class LevelFive(Level):
                    
         #Road Rules
         roads = self.get_targets(self.playerCar)#Checks if player is on the road
+        
+        timer = pygame.time.get_ticks()
         if self.playerCar.isStopped():
-            return "Fail"
+            #waits 3 seconds before failing so player can see the explosion
+            if (pygame.time.get_ticks() - timer) > 3000:
+                return "Fail"
         
         #if player is offroad or between roads for more than a second, fail
         if len(roads) != 1:
@@ -91,7 +95,6 @@ class LevelFive(Level):
                 self.offRoadTimer = pygame.time.get_ticks()
                 
             else:
-                print(f"Offroad for {pygame.time.get_ticks() - self.offRoadTimer} milliseconds")
                 if pygame.time.get_ticks() - self.offRoadTimer >= 1000:
                     return "Fail"
             
@@ -99,7 +102,6 @@ class LevelFive(Level):
             self.playerCar.offRoad = False
             
         #if player goes past the median, fail
-        print(self.playerCar.rect.y)
         if self.playerCar.rect.y < (screen_height/3):
             return "Fail"
             
