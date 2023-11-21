@@ -12,6 +12,7 @@ class AbstractCar(pygame.sprite.Sprite):
         self.acceleration = 0.2
         self.angle = startAngle % 360 # Direction the car is facing (increased angle is clockwise rotation)
         self.stopped = False
+        self.offRoad = False
         self.collideGroups = []
         
         self.subX, self.subY = 0, 0 # Keeps track of small changes in position
@@ -63,41 +64,6 @@ class AbstractCar(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=oldCenter)        
     
-    def snapTurn(self):
-        snapBuffer = 4 #Need to dial this in to make it work right
-        if (abs(self.velocity)*self.turnSpeed) > snapBuffer:
-            #Snap up
-            if self.angle < 270 + snapBuffer and self.angle > 270 - snapBuffer:
-                self.angle = 270 
-            
-            #Snap down
-            if self.angle < 90 + snapBuffer and self.angle > 90 - snapBuffer:
-                self.angle = 90  
-            
-            #Snap right
-            if self.angle < 0 + snapBuffer and self.angle > 0 - snapBuffer:
-                self.angle = 0
-                
-            #Snap left
-            if self.angle < 180 + snapBuffer and self.angle > 180 - snapBuffer:
-                self.angle = 180
-                
-            #Snap up-right
-            if self.angle < 315 + snapBuffer and self.angle > 315 - snapBuffer:
-                self.angle = 315
-                
-            #Snap down-right
-            if self.angle < 45 + snapBuffer and self.angle > 45 - snapBuffer:
-                self.angle = 45
-                
-            #Snap up-left
-            if self.angle < 225 + snapBuffer and self.angle > 225 - snapBuffer:
-                self.angle = 225
-                
-            #Snap down-left
-            if self.angle < 135 + snapBuffer and self.angle > 135 - snapBuffer:
-                self.angle = 135
-        
     def move(self):
         delta_x = self.velocity * math.cos(math.radians(self.angle))
         delta_y = self.velocity * math.sin(math.radians(self.angle))
@@ -129,6 +95,9 @@ class AbstractCar(pygame.sprite.Sprite):
         
     def isStopped(self):
         return self.stopped
+    
+    def isOffRoad(self):
+        return self.offRoad
     
     def getAngle(self):
         return self.angle
