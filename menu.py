@@ -68,6 +68,7 @@ quit_to_title = "Quit to Title Screen"
 
 #define game over
 game_fail = "Game Over"
+game_pass = "You Pass"
 
 #define restart or quit message
 ask_retry = "Press 'spacebar' to retry the level"
@@ -90,7 +91,13 @@ play_state = False
 pause_state = False
 paused_level_screen = False
 
-#set end_state to False to control level end screen portion of game loop
+#set fail_state to False to control level fail screen portion of game loop
+fail_state = False
+
+#set pass_state to False to control level pass screen portion of game loop
+pass_state = False
+
+#set end_state to False to control level end portion of game loop, resets levels so they can be restarted
 end_state = False
 
 botTurned = False
@@ -157,6 +164,8 @@ for i in range(level_count):
 #creates surfaces for the game over screen and retry message
 fail_surf = menu_font.render(game_fail, False, 'red')
 fail_rect = fail_surf.get_rect(midtop = (resW / 2, 25))
+pass_surf = menu_font.render(game_pass, False, 'red')
+pass_rect = menu_font.render(game_pass, False, 'red')
 retry_surf = menu_font.render(ask_retry, False, 'red')
 retry_rect = retry_surf.get_rect(midtop = (resW / 2, 100))
 
@@ -274,7 +283,7 @@ if __name__ == "__main__":
                     
                     if playerCar.isStopped():
                         play_state = False
-                        end_state = True
+                        fail_state = True
                         
                     screen.fill(Level.BG_COLOR)
                     #myCar.addTargets(((resW / 2) - 107.5, botLaneY))
@@ -289,9 +298,14 @@ if __name__ == "__main__":
 
                     else: 
                         pOrF = lFour.update(screen)
-                        if pOrF == "Pass" or pOrF == "Fail":
+                        if pOrF == "Pass":
                             play_state = False
-                            end_state = True
+                            pass_state = True
+                            print(pOrF)
+
+                        elif pOrF == "Fail":
+                            play_state = False
+                            fail_state = True
                             print(pOrF)
 
                 case 5:
@@ -301,9 +315,14 @@ if __name__ == "__main__":
                     
                     else:
                         pOrF = lFive.update(screen)
-                        if pOrF =="Pass" or pOrF == "Fail":
+                        if pOrF == "Pass":
                             play_state = False
-                            end_state = True
+                            pass_state = True
+                            print(pOrF)
+
+                        elif pOrF == "Fail":
+                            play_state = False
+                            fail_state = True
                             print(pOrF)
 
             display_score()
@@ -323,10 +342,19 @@ if __name__ == "__main__":
             elif quit_desktop_rect.collidepoint(mouse_pos):
                 pygame.draw.rect(screen, 'lawngreen', quit_desktop_rect, 3) 
 
-        if end_state:
+        if pass_state:
+            screen.blit(pass_surf, pass_rect)
+            screen.blit(retry_surf, retry_rect)
+            screen.blit(return_title_surf, return_title_rect)
+            pass_state = False
+            end_state = True
+
+        if fail_state:
             screen.blit(fail_surf, fail_rect)
             screen.blit(retry_surf, retry_rect)
             screen.blit(return_title_surf, return_title_rect)
+            fail_state = False
+            end_state = True
 
 
         #----event loop checks for all possible events in the game----
@@ -473,7 +501,6 @@ if __name__ == "__main__":
                     match level_choice:
                         case 1:
                             print(level_choice)
-
                         case 2:
                             print(level_choice)
                         case 3:
