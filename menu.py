@@ -188,6 +188,9 @@ if __name__ == "__main__":
 
     #level 4
     lFour = None
+
+    #level 5
+    lFive = None
     target_one = True
     target_two = False
     target_three = False
@@ -292,7 +295,16 @@ if __name__ == "__main__":
                             print(pOrF)
 
                 case 5:
-                    screen.fill((255, 100, 200))
+                    if lFive == None:
+                        #level 5
+                        lFive = LevelFive(screen, resW, resH)
+                    
+                    else:
+                        pOrF = lFive.update(screen)
+                        if pOrF =="Pass" or pOrF == "Fail":
+                            play_state = False
+                            end_state = True
+                            print(pOrF)
 
             display_score()
             
@@ -458,6 +470,19 @@ if __name__ == "__main__":
                     target_three = False
                     botTurned = False
                     paused_time = 0
+                    match level_choice:
+                        case 1:
+                            print(level_choice)
+
+                        case 2:
+                            print(level_choice)
+                        case 3:
+                            print(level_choice)
+                        case 4:
+                            lFour = None
+                        case 5:
+                            lFive = None
+
                     if cars_group:
                         player.remove(playerCar)
                         BotCars.remove(myCar)
