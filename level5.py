@@ -11,10 +11,9 @@ class LevelFive(Level):
         super().__init__(screen_width,screen_height)
         
         #Level Elements
-        ramp_length = 750 #diagonal length of on-ramp (in pixels)
-        self.add_4_lane_divided(0,screen_height/3,screen_width,screen_height/3)
-        self.add_diagonal_road(0,screen_height,(ramp_length*math.cos(math.radians(45))),screen_height-(ramp_length*math.sin(math.radians(45))))
+        self.add_4_lane_with_on_ramp(0,screen_height/3,screen_width,screen_height/3,0,screen_height)
         self.add_random_decorations(20)
+        self.offRoadTimer = pygame.time.get_ticks()
         
         #Player
         self.player = pygame.sprite.GroupSingle()
@@ -81,19 +80,35 @@ class LevelFive(Level):
                    botCar.kill()
                    
         #Road Rules
-        timer = pygame.time.get_ticks() #initializing for later
         roads = self.get_targets(self.playerCar)#Checks if player is on the road
+        
+        timer = pygame.time.get_ticks()
         if self.playerCar.isStopped():
-            return "Fail"
+            #waits 3 seconds before failing so player can see the explosion
+            if (pygame.time.get_ticks() - timer) > 3000:
+                return "Fail"
         
         #if player is offroad or between roads for more than a second, fail
         if len(roads) != 1:
-            if pygame.time.get_ticks() - timer > 1000:
-                return "Fail"
-            timer = pygame.time.get_ticks()
+            if bool(self.playerCar.isOffRoad()) == False:
+                self.playerCar.offRoad = True
+                self.offRoadTimer = pygame.time.get_ticks()
+                
+            else:
+                if pygame.time.get_ticks() - self.offRoadTimer >= 1000:
+                    return "Fail"
             
+        else:
+            self.playerCar.offRoad = False
+            
+        #if player goes past the median, fail
+        if self.playerCar.rect.y < (screen_height/3):
+            return "Fail"
+            
+        #If player successfully merges and continues to the right, pass
         if self.playerCar.rect.x > screen_width + 50:
             return "Pass"
+        
         else:
             return "NA"
         
