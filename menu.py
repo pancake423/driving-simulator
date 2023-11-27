@@ -10,8 +10,11 @@ from levels import Level, RectSprite, ImageSprite, RoadLane, Level
 #import level_Tut function
 from levelTut import level_Tutorial
 
-#import level_Four function
-from Level4 import level_Four
+#import LevelFour class
+from Level4 import LevelFour
+
+#import levelFive class
+from level5 import LevelFive
 
 def display_score(x_axis = 25, y_axis = 25):
     current_time = "Score: " + str((pygame.time.get_ticks() - start_time - paused_time) / 1000)
@@ -104,7 +107,7 @@ resH = 1080
 resCH = 420
 
 #set the screen using resW and resH as arguments
-screen = pygame.display.set_mode((resW, resH))
+screen = pygame.display.set_mode((resW, resH), pygame.FULLSCREEN)
 
 #set background image for title menu
 background = pygame.image.load('assets/standard-road.png')
@@ -149,6 +152,7 @@ level_list = [None for i in range(level_count)]
 for i in range(level_count):
     level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'lawn green'))
     level_rect_list.append(level_surf_list[i].get_rect(topleft = (120, 50 + (i * 130))))
+    
 
 #creates surfaces for the game over screen and retry message
 fail_surf = menu_font.render(game_fail, False, 'red')
@@ -182,6 +186,8 @@ if __name__ == "__main__":
     #initialize pygame
     pygame.init()
 
+    #level 4
+    lFour = None
     target_one = True
     target_two = False
     target_three = False
@@ -262,6 +268,10 @@ if __name__ == "__main__":
                             target_three = True
                     if target_three:
                         myCar.setTarget(((resW / 2) + 65, 0))
+                    
+                    if playerCar.isStopped():
+                        play_state = False
+                        end_state = True
                         
                     screen.fill(Level.BG_COLOR)
                     #myCar.addTargets(((resW / 2) - 107.5, botLaneY))
@@ -270,45 +280,23 @@ if __name__ == "__main__":
                 case 3:
                     screen.fill((100, 200, 255))
                 case 4:
-                    topLaneY = resH / 2 + 10
-                    botLaneY = resH / 2 - 110
-                    x_flip = False
-                    if level_list[level_choice - 1] == None:
-                        level_list[level_choice - 1] = level_Four(screen, resW, resH)
+                    if lFour == None:
+                        #level 4
+                        lFour = LevelFour(screen, resW, resH)
 
-                    if not cars_group:
-                        playerCar = PlayerCar((topLaneX, topLaneY))
-                        myCar = BotCar((botLaneX, botLaneY), 180)
-                        player.add(playerCar)
-                        BotCars.add(myCar)
-                        playerCar.setCollide([BotCars])
-                        myCar.setCollide([player])
-                        cars_group = True
-
-                    myCar.setTarget((-1000, topLaneY))
-                    screen.fill(Level.BG_COLOR)
-
-                    playerPos, botPos = playerCar.getPos(), myCar.getPos()
-                    playerX, playerY = playerPos
-                    botX, botY = botPos
-        
-                    if not botTurned and botX - playerX < 450:
-                        myCar.setTarget((playerX + 100, playerY), True)
-                        botTurned = True
+                    else: 
+                        pOrF = lFour.update(screen)
+                        if pOrF == "Pass" or pOrF == "Fail":
+                            play_state = False
+                            end_state = True
+                            print(pOrF)
 
                 case 5:
                     screen.fill((255, 100, 200))
 
-            player.update() 
-            BotCars.update()
-            level_list[level_choice - 1].draw(screen, 0, 0)  
-            BotCars.draw(screen)
-            player.draw(screen)
             display_score()
-
-            if playerCar.isStopped():
-                play_state = False
-                end_state = True
+            
+            pygame.display.flip()
 
         if pause_state:
             screen.blit(pause_surf, pause_rect)

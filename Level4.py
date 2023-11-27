@@ -27,7 +27,7 @@ class LevelFour(Level):
         self.botTurned = False
         self.startTime = pygame.time.get_ticks()
         
-    def update(self):
+    def update(self, screen):
         self.draw(screen, 0, 0)
         
         self.playerGroup.update()
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        status = myLevel.update()
+        status = myLevel.update(screen)
         
         if status == "Pass" or status == "Fail":
             run = False
