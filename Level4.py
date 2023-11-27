@@ -51,7 +51,7 @@ class LevelFour(Level):
             # Road Rules (Other lane, off road, wrong way, or not up to speed)
             if (len(roads) != 1 or
                 (playerAngle > 90 and playerAngle < 270) or
-                (playerSpeed < 30 and timePassed > 2)):
+                (playerSpeed < 30 and timePassed > 3)):
                 
                 return "Fail"
             
