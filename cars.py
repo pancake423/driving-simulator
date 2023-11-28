@@ -143,12 +143,6 @@ class PlayerCar(AbstractCar):
                 self.turn("left")
             turned = True
             
-        """
-        if keys[pygame.K_RIGHT] == False and keys[pygame.K_d] == False:
-            self.snapTurn()
-        if keys[pygame.K_LEFT] == False and keys[pygame.K_a] == False:
-            self.snapTurn()
-        """
         
         if not turned:
             self.autoTurn()
@@ -157,12 +151,13 @@ class PlayerCar(AbstractCar):
             self.brake()
             
     def autoTurn(self):
-        angleInterval = self.angle % 45
-        buffer = 1
+        angleInterval = self.angle % 90
+        buffer = 2
+        width = 15
         
-        if angleInterval > 45/2 and angleInterval < 45 - buffer:
+        if angleInterval > 90 - width and angleInterval < 90 - buffer:
             self.turn("right", 0.4)
-        elif angleInterval <= 45/2 and angleInterval > buffer:
+        elif angleInterval < width and angleInterval > buffer:
             self.turn("left", 0.4)
     
     def update(self):
@@ -181,7 +176,6 @@ class BotCar(AbstractCar):
         self.crash_sound.set_volume(0.3)
         self.nextTargets = []
         self.targetBuffer = 30
-        self.stopSigns = []
     
     #Move the bot towards the target
     def bot_move(self):
@@ -236,23 +230,11 @@ class BotCar(AbstractCar):
     
     def queuedTargets(self):
         return len(self.nextTargets)
-
-                
-    def checkStopSign(self, stopSigns):
-        for signCoords in self.stopSigns:
-            sign_x, sign_y = signCoords
-            distance = math.sqrt((self.rect.centerx - sign_x) ** 2 + (self.rect.centery - sign_y) ** 2)
-            if distance < 50:
-                self.velocity = 0
-                break
-            else:
-                self.velocity = 3
     
     def update(self):
         self.checkCollison()
         if self.stopped == False:
             self.bot_move()
-            self.checkStopSign(self.stopSigns) 
             self.move()
             if self.newTarget() and len(self.nextTargets) > 0:
                 self.target = self.nextTargets.pop(0)
