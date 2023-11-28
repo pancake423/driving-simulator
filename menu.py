@@ -10,8 +10,11 @@ from levels import Level, RectSprite, ImageSprite, RoadLane, Level
 #import level_Tut function
 from levelTut import level_Tutorial
 
-#import level_Four function
-from Level4 import level_Four
+#import LevelFour class
+from Level4 import LevelFour
+
+#import levelFive class
+from level5 import LevelFive
 
 def display_score(x_axis = 25, y_axis = 25):
     current_time = "Score: " + str((pygame.time.get_ticks() - start_time - paused_time) / 1000)
@@ -65,6 +68,7 @@ quit_to_title = "Quit to Title Screen"
 
 #define game over
 game_fail = "Game Over"
+game_pass = "You Pass"
 
 #define restart or quit message
 ask_retry = "Press 'spacebar' to retry the level"
@@ -87,7 +91,13 @@ play_state = False
 pause_state = False
 paused_level_screen = False
 
-#set end_state to False to control level end screen portion of game loop
+#set fail_state to False to control level fail screen portion of game loop
+fail_state = False
+
+#set pass_state to False to control level pass screen portion of game loop
+pass_state = False
+
+#set end_state to False to control level end portion of game loop, resets levels so they can be restarted
 end_state = False
 
 botTurned = False
@@ -104,7 +114,7 @@ resH = 1080
 resCH = 420
 
 #set the screen using resW and resH as arguments
-screen = pygame.display.set_mode((resW, resH))
+screen = pygame.display.set_mode((resW, resH), pygame.FULLSCREEN)
 
 #set background image for title menu
 background = pygame.image.load('assets/standard-road.png')
@@ -149,10 +159,13 @@ level_list = [None for i in range(level_count)]
 for i in range(level_count):
     level_surf_list.append(menu_font.render("Level " + str(i + 1), False, 'lawn green'))
     level_rect_list.append(level_surf_list[i].get_rect(topleft = (120, 50 + (i * 130))))
+    
 
 #creates surfaces for the game over screen and retry message
 fail_surf = menu_font.render(game_fail, False, 'red')
 fail_rect = fail_surf.get_rect(midtop = (resW / 2, 25))
+pass_surf = menu_font.render(game_pass, False, 'red')
+pass_rect = menu_font.render(game_pass, False, 'red')
 retry_surf = menu_font.render(ask_retry, False, 'red')
 retry_rect = retry_surf.get_rect(midtop = (resW / 2, 100))
 
@@ -182,6 +195,11 @@ if __name__ == "__main__":
     #initialize pygame
     pygame.init()
 
+    #level 4
+    lFour = None
+
+    #level 5
+    lFive = None
     target_one = True
     target_two = False
     target_three = False
@@ -262,6 +280,10 @@ if __name__ == "__main__":
                             target_three = True
                     if target_three:
                         myCar.setTarget(((resW / 2) + 65, 0))
+                    
+                    if playerCar.isStopped():
+                        play_state = False
+                        fail_state = True
                         
                     screen.fill(Level.BG_COLOR)
                     #myCar.addTargets(((resW / 2) - 107.5, botLaneY))
@@ -270,45 +292,42 @@ if __name__ == "__main__":
                 case 3:
                     screen.fill((100, 200, 255))
                 case 4:
-                    topLaneY = resH / 2 + 10
-                    botLaneY = resH / 2 - 110
-                    x_flip = False
-                    if level_list[level_choice - 1] == None:
-                        level_list[level_choice - 1] = level_Four(screen, resW, resH)
+                    if lFour == None:
+                        #level 4
+                        lFour = LevelFour(screen, resW, resH)
 
-                    if not cars_group:
-                        playerCar = PlayerCar((topLaneX, topLaneY))
-                        myCar = BotCar((botLaneX, botLaneY), 180)
-                        player.add(playerCar)
-                        BotCars.add(myCar)
-                        playerCar.setCollide([BotCars])
-                        myCar.setCollide([player])
-                        cars_group = True
+                    else: 
+                        pOrF = lFour.update(screen)
+                        if pOrF == "Pass":
+                            play_state = False
+                            pass_state = True
+                            print(pOrF)
 
-                    myCar.setTarget((-1000, topLaneY))
-                    screen.fill(Level.BG_COLOR)
-
-                    playerPos, botPos = playerCar.getPos(), myCar.getPos()
-                    playerX, playerY = playerPos
-                    botX, botY = botPos
-        
-                    if not botTurned and botX - playerX < 450:
-                        myCar.setTarget((playerX + 100, playerY), True)
-                        botTurned = True
+                        elif pOrF == "Fail":
+                            play_state = False
+                            fail_state = True
+                            print(pOrF)
 
                 case 5:
-                    screen.fill((255, 100, 200))
+                    if lFive == None:
+                        #level 5
+                        lFive = LevelFive(screen, resW, resH)
+                    
+                    else:
+                        pOrF = lFive.update(screen)
+                        if pOrF == "Pass":
+                            play_state = False
+                            pass_state = True
+                            print(pOrF)
 
-            player.update() 
-            BotCars.update()
-            level_list[level_choice - 1].draw(screen, 0, 0)  
-            BotCars.draw(screen)
-            player.draw(screen)
+                        elif pOrF == "Fail":
+                            play_state = False
+                            fail_state = True
+                            print(pOrF)
+
             display_score()
-
-            if playerCar.isStopped():
-                play_state = False
-                end_state = True
+            
+            pygame.display.flip()
 
         if pause_state:
             screen.blit(pause_surf, pause_rect)
@@ -323,10 +342,19 @@ if __name__ == "__main__":
             elif quit_desktop_rect.collidepoint(mouse_pos):
                 pygame.draw.rect(screen, 'lawngreen', quit_desktop_rect, 3) 
 
-        if end_state:
+        if pass_state:
+            screen.blit(pass_surf, pass_rect)
+            screen.blit(retry_surf, retry_rect)
+            screen.blit(return_title_surf, return_title_rect)
+            pass_state = False
+            end_state = True
+
+        if fail_state:
             screen.blit(fail_surf, fail_rect)
             screen.blit(retry_surf, retry_rect)
             screen.blit(return_title_surf, return_title_rect)
+            fail_state = False
+            end_state = True
 
 
         #----event loop checks for all possible events in the game----
@@ -470,6 +498,18 @@ if __name__ == "__main__":
                     target_three = False
                     botTurned = False
                     paused_time = 0
+                    match level_choice:
+                        case 1:
+                            print(level_choice)
+                        case 2:
+                            print(level_choice)
+                        case 3:
+                            print(level_choice)
+                        case 4:
+                            lFour = None
+                        case 5:
+                            lFive = None
+
                     if cars_group:
                         player.remove(playerCar)
                         BotCars.remove(myCar)

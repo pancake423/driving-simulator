@@ -36,7 +36,7 @@ class LevelFive(Level):
         self.botCar1.setCollide([self.player])
         self.botCar2.setCollide([self.player])
     
-    def update(self):
+    def update(self, screen):
         self.draw(screen, 0, 0)
         self.bots.draw(screen)
         self.bots.update()
@@ -53,18 +53,18 @@ class LevelFive(Level):
                 if randint(0,1) == 1:
                     #Divides traffic between both lanes
                     if randint(0,1) == 1:
-                        self.botCar = BotCar((-50,screen_height/3 + 90))
-                        self.botCar.setTarget(((screen_width + 100,screen_height/3 + 90),False))
+                        self.botCar = BotCar((-50,self.height/3 + 90))
+                        self.botCar.setTarget(((self.width + 100,self.height/3 + 90),False))
                     else:
-                        self.botCar = BotCar((-50,screen_height/3 + 180))
-                        self.botCar.setTarget(((screen_width + 100,screen_height/3 + 180),False))
+                        self.botCar = BotCar((-50,self.height/3 + 180))
+                        self.botCar.setTarget(((self.width + 100,self.height/3 + 180),False))
                 else:
                     if randint(0,1) == 1:
-                        self.botCar = BotCar((screen_width + 50,screen_height/4),180)
-                        self.botCar.setTarget(((-200,screen_height/4),False))
+                        self.botCar = BotCar((self.width + 50,self.height/4),180)
+                        self.botCar.setTarget(((-200,self.height/4),False))
                     else:
-                        self.botCar = BotCar((screen_width + 50,screen_height/4 - 90),180)
-                        self.botCar.setTarget(((-200,screen_height/4 - 90),False))
+                        self.botCar = BotCar((self.width + 50,self.height/4 - 90),180)
+                        self.botCar.setTarget(((-200,self.height/4 - 90),False))
                 
                 self.last_spawned = pygame.time.get_ticks()
                 
@@ -75,7 +75,7 @@ class LevelFive(Level):
         else:    
             #Deletes bots once they go offscreen
             for botCar in self.botList:
-                if botCar.rect.x > screen_width + 100 or botCar.rect.x < -100:
+                if botCar.rect.x > self.width + 100 or botCar.rect.x < -100:
                    self.botList.remove(botCar)
                    botCar.kill()
                    
@@ -102,11 +102,11 @@ class LevelFive(Level):
             self.playerCar.offRoad = False
             
         #if player goes past the median, fail
-        if self.playerCar.rect.y < (screen_height/3):
+        if self.playerCar.rect.y < (self.height/3):
             return "Fail"
             
         #If player successfully merges and continues to the right, pass
-        if self.playerCar.rect.x > screen_width + 50:
+        if self.playerCar.rect.x > self.width + 50:
             return "Pass"
         
         else:
@@ -128,7 +128,7 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 run = False
                 
-        status = level.update()
+        status = level.update(screen)
         if status == "Pass" or status == "Fail":
             run = False
             print(status)
