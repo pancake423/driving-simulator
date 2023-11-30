@@ -131,19 +131,7 @@ def level_Three(screen, screen_width, screen_height):
     
      
     
-#displays the timer onto the screen
-#def display_score(x_axis = 25, y_axis = 25):
-    #Declarations
-    #start_time = 0
-    #time_at_pause = 0
-    #paused_time = 0
-    #font type & size
-    #timerFont = pygame.font.Font(fontType, 40)
-    #Puts the timer onto the screen
-    #current_time = "Timer: " + str((pygame.time.get_ticks() - start_time - paused_time) / 1000)
-    #score_surf = timerFont.render(current_time, False, "red")
-    #score_rect = score_surf.get_rect(topleft = (x_axis, y_axis))
-    #screen.blit(score_surf, score_rect)
+
 if __name__ == "__main__":
     # Initialize pygame
     pygame.init()
