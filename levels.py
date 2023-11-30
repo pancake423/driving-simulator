@@ -374,12 +374,12 @@ class Level:
         self.road_layer.add(
             RoadLane(ramp_x, ramp_y, *ramp_end),
             RoadLane(
-                    *move_perp(x1, y1, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2),
-                    *move_perp(*join_point, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2)
+                    *move_perp(x1, y1, Level.LANE_WIDTH*1.75 + Level.LINE_WIDTH*4),
+                    *move_perp(*join_point, Level.LANE_WIDTH*1.75 + Level.LINE_WIDTH*4)
             ),
             RoadLane(
-                    *move_perp(*join_point, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2),
-                    *move_perp(x2, y2, (Level.LANE_WIDTH + Level.LINE_WIDTH)/2)
+                    *move_perp(*join_point, Level.LANE_WIDTH*1.75 + Level.LINE_WIDTH*4),
+                    *move_perp(x2, y2, Level.LANE_WIDTH*1.75 + Level.LINE_WIDTH*4)
             ),
         )
 

@@ -35,9 +35,10 @@ inter_x = screen_width // 2
 inter_y = screen_height // 2
 
 #call functions to add roads, intersections, etc
-level.add_t_intersection(inter_x, inter_y)
+level.add_4_lane_with_on_ramp(0, inter_y, screen_width, inter_y, 0, screen_height)
+#level.add_4_lane_divided(0, inter_y, screen_width, inter_y)
 
-level.add_random_decorations(60)
+level.add_random_decorations(120)
 
 # Main game loop
 running = True
@@ -50,7 +51,7 @@ while running:
     screen.fill(Level.BG_COLOR)
 
     # Draw the level
-    level.draw(screen, 0, 0)
+    level.draw(screen, 0, 0, debug=True)
 
     # Update the display
     pygame.display.flip()
