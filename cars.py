@@ -136,7 +136,7 @@ class PlayerCar(AbstractCar):
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             self.accelerate()
             #Play the engine sound every second while accelerating
-            if pygame.time.get_ticks() - self.engine_timer > 1000:
+            if pygame.time.get_ticks() - self.engine_timer > 1012:
                 self.channel = pygame.mixer.Channel(1)
                 self.channel.play(self.engine_sound)
                 self.engine_timer = pygame.time.get_ticks()
@@ -175,7 +175,7 @@ class PlayerCar(AbstractCar):
             self.turn("left", 0.4)
             
     def honk(self):
-        if pygame.time.get_ticks() - self.horn_timer > 1000:
+        if pygame.time.get_ticks() - self.horn_timer > 1012:
             self.channel = pygame.mixer.Channel(0)
             self.channel.play(self.honk_sound)
             self.horn_timer = pygame.time.get_ticks()
