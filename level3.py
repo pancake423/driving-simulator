@@ -41,14 +41,14 @@ class levelthree(Level):
         self.level_surf = levelFont.render(levelNum, True, "red")
         self.level_rect = self.level_surf.get_rect(topright = (screen_width - 20, 20))
         
-        topLaneY = screen_height / 2 - 110
-        botLaneY = screen_height / 2 + 10
+        self.topLaneY = screen_height / 2 - 110
+        self.botLaneY = screen_height / 2 + 10
         
         self.playerCar = PlayerCar((80, 600))
         self.playerGroup = pygame.sprite.GroupSingle()
         self.playerGroup.add(self.playerCar)
         
-        self.botCar = BotCar((screen_width, topLaneY + 50), 180)
+        self.botCar = BotCar((screen_width, self.topLaneY + 50), 180)
         self.botCar2 = BotCar((x1 - 50, 50), 90)
         self.botCar3 = BotCar((x2 + 50, screen_height - 50), 270)
         
@@ -58,9 +58,9 @@ class levelthree(Level):
         self.botGroup.add(self.botCar2)
         self.botGroup.add(self.botCar3)
         
-        self.botCar.setTarget(((1150, topLaneY + 50), True))
-        self.botCar2.setTarget(((900, topLaneY - 60), True))
-        self.botCar3.setTarget(((1000, topLaneY + 270), True))
+        self.botCar.setTarget(((1150, self.topLaneY + 50), True))
+        self.botCar2.setTarget(((900, self.topLaneY - 60), True))
+        self.botCar3.setTarget(((1000, self.topLaneY + 270), True))
         
         self.playerCar.setCollide([self.botGroup])
         self.botCar.setCollide([self.playerGroup])
@@ -84,6 +84,10 @@ class levelthree(Level):
         self.stopSign= pygame.image.load('assets/stop-sign.png')
         self.stopSign = pygame.transform.smoothscale(self.stopSign,(60, 60)).convert_alpha()
         self.stopSignCoords = [(760, 670), (1090, 670), (1090, 350), (760,350)]
+        
+        #variables for timer
+        self.carsGone = 0
+        self.timer = pygame.time.get_ticks()
 
     def update(self,screen):
         # Clear the screen
@@ -99,16 +103,30 @@ class levelthree(Level):
         screen.blit(self.stopSign, (1090, 350))
         screen.blit(self.stopSign, (760, 350))
         
+        if self.carsGone == 0 and self.botCar.newTarget() and (pygame.time.get_ticks() - self.timer()) / 1000 > 2:
+            self.timer = pygame.time.get_ticks()
+        if (pygame.time.get_ticks() - self.timer) / 1000 > 2:
+            self.timer = pygame.time.get_ticks()
+            if self.carsGone == 0:
+                self.botCar3.setTarget(((1000, -200), True))
+            elif self.carsGone == 1:   
+                self.botCar2.setTarget(((900, self.height + 200), True))
+            elif self.carsGone == 2:
+                self.botCar.setTarget(((-200, self.topLaneY + 50), True))
+            self.carsGone += 1
+
+        
+            
+            
+
+        playerPos, botPos = self.playerCar.getPos(), self.botCar.getPos()
+        playerX, playerY = playerPos
+        botX, botY = botPos
+        
         self.playerGroup.update()
         self.botGroup.update()
         self.playerGroup.draw(screen)
         self.botGroup.draw(screen)
-        
-
-        playerPos, botPos = self.playerCar.getPos(), self.botCar.getPos()
-        self.botCar.update()
-        playerX, playerY = playerPos
-        botX, botY = botPos
 
 """
 def level_Three(screen, screen_width, screen_height):
