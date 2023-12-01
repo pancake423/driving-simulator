@@ -122,12 +122,24 @@ class PlayerCar(AbstractCar):
         super().__init__(startPos, angle)
         self.crash_sound = pygame.mixer.Sound("assets\\crash.mp3")
         self.crash_sound.set_volume(0.3)
+        self.honk_sound = pygame.mixer.Sound("assets\\playerHonk.mp3")
+        self.honk_sound.set_volume(0.5)
+        self.engine_sound = pygame.mixer.Sound("assets\\playerEngine.mp3")
+        self.engine_sound.set_volume(0.1)
+        self.engine_timer = pygame.time.get_ticks() #initializing for later
+        self.horn_timer = pygame.time.get_ticks() #initializing for later
         
     def player_input(self):
         turned = False
+        
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             self.accelerate()
+            #Play the engine sound every second while accelerating
+            if pygame.time.get_ticks() - self.engine_timer > 1000:
+                self.channel = pygame.mixer.Channel(1)
+                self.channel.play(self.engine_sound)
+                self.engine_timer = pygame.time.get_ticks()
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.decelerate()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -143,12 +155,14 @@ class PlayerCar(AbstractCar):
                 self.turn("left")
             turned = True
             
-        
         if not turned:
             self.autoTurn()
         
         if keys[pygame.K_SPACE]:
             self.brake()
+            
+        if keys[pygame.K_h]:
+            self.honk()
             
     def autoTurn(self):
         angleInterval = self.angle % 90
@@ -159,6 +173,12 @@ class PlayerCar(AbstractCar):
             self.turn("right", 0.4)
         elif angleInterval < width and angleInterval > buffer:
             self.turn("left", 0.4)
+            
+    def honk(self):
+        if pygame.time.get_ticks() - self.horn_timer > 1000:
+            self.channel = pygame.mixer.Channel(0)
+            self.channel.play(self.honk_sound)
+            self.horn_timer = pygame.time.get_ticks()
     
     def update(self):
         self.checkCollison()
