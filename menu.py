@@ -405,15 +405,15 @@ if __name__ == "__main__":
                     paused_time = 0
                     match level_choice:
                         case 1:
-                            print(level_choice)
+                            level = levelone(screen, resW, resH)
                         case 2:
-                            print(level_choice)
+                            screen.fill((255, 200, 100))
                         case 3:
-                            print(level_choice)
+                            level = levelthree(screen, resW, resH)
                         case 4:
-                            lFour = None
+                            level = LevelFour(screen, resW, resH)
                         case 5:
-                            lFive = None
+                            level = LevelFive(screen, resW, resH)
 
                     if cars_group:
                         player.remove(playerCar)
