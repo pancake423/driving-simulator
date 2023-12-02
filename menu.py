@@ -384,9 +384,6 @@ if __name__ == "__main__":
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     level_state = True
                     end_state = False
-                    target_one = True
-                    target_two = False
-                    target_three = False
                     paused_time = 0
                     
         #----end event loop----
