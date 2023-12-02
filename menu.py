@@ -98,9 +98,6 @@ pass_state = False
 #set end_state to False to control level end portion of game loop, resets levels so they can be restarted
 end_state = False
 
-botTurned = False
-
-cars_group = False
 
 #set amount of levels
 level_count = 5
@@ -384,10 +381,6 @@ if __name__ == "__main__":
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     play_state = True
                     end_state = False
-                    target_one = True
-                    target_two = False
-                    target_three = False
-                    botTurned = False
                     paused_time = 0
                     match level_choice:
                         case 1:
@@ -401,34 +394,12 @@ if __name__ == "__main__":
                         case 5:
                             level = LevelFive(screen, resW, resH)
 
-                    if cars_group:
-                        player.remove(playerCar)
-                        BotCars.remove(myCar)
-                        cars_group = False
-                    #if not cars_group:
-                        #if (x_flip):
-                            #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY), 180), BotCar((botLaneX, botLaneY)))
-                        #else:
-                            #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY)), BotCar((botLaneX, botLaneY), 180))
                     start_time = pygame.time.get_ticks()
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     level_state = True
                     end_state = False
-                    target_one = True
-                    target_two = False
-                    target_three = False
-                    botTurned = False
                     paused_time = 0
-                    if cars_group:
-                        player.remove(playerCar)
-                        BotCars.remove(myCar)
-                        cars_group = False
-                    #if not cars_group:
-                        #if (x_flip):
-                            #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY), 180), BotCar((botLaneX, botLaneY)))
-                        #else:
-                            #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY)), BotCar((botLaneX, botLaneY), 180))
 
         #----end event loop----
 
