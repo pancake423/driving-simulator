@@ -7,13 +7,11 @@ from cars import PlayerCar, BotCar
 #import classes Level, RectSprite, ImageSprite, & RoadLane
 from levels import Level, RectSprite, ImageSprite, RoadLane, Level
 
-#import level_Tut function
+#import levels
 from levelTut import level_Tutorial
-
-#import LevelFour class
+from Level1 import levelone
+from level3 import levelthree
 from Level4 import LevelFour
-
-#import levelFive class
 from level5 import LevelFive
 
 def display_score(x_axis = 25, y_axis = 25):
@@ -195,15 +193,7 @@ if __name__ == "__main__":
     #initialize pygame
     pygame.init()
 
-    #level 4
-    lFour = None
-
-    #level 5
-    lFive = None
-    target_one = True
-    target_two = False
-    target_three = False
-
+    level = None
     #game loop runs unitl a quit condition is met
     while True:
 
@@ -239,95 +229,13 @@ if __name__ == "__main__":
             screen.blit(start_surf, start_rect)
 
         if play_state:
-            topLaneY = 0
-            topLaneX = 80
-            botLaneY = 0
-            botLaneX = resW
-            x_flip = False
-            match level_choice:
-                case 1:
-                    topLaneY = (resH / 2) - 65
-                    topLaneX = resW - 80
-                    botLaneY = (resH / 2) + 65
-                    botLaneX = 80
-                    x_flip = True
-
-                    if level_list[level_choice - 1] == None:
-                        level_list[level_choice - 1] = level_Tutorial(screen, resW, resH)
-
-                    if not cars_group:
-                        playerCar = PlayerCar((topLaneX, topLaneY), 180)
-                        myCar = BotCar((botLaneX, botLaneY))
-                        BotCars.add(myCar)
-                        player.add(playerCar)
-                        playerCar.setCollide([BotCars])
-                        myCar.setCollide([player])
-                        cars_group = True
-
-                    playerPos, botPos = playerCar.getPos(), myCar.getPos()
-                    playerX, playerY = playerPos
-                    botX, botY = botPos
-
-                    if target_one:
-                        myCar.setTarget(((resW / 2) - 107.5, botLaneY))
-                        if botX >= ((resW / 2) - 107.5):
-                            target_one = False
-                            target_two = True
-                    if target_two:
-                        myCar.setTarget(((resW / 2) + 65, botLaneY - 107.5))
-                        if botY >= (botLaneY - 107.5):
-                            target_two = False
-                            target_three = True
-                    if target_three:
-                        myCar.setTarget(((resW / 2) + 65, 0))
-                    
-                    if playerCar.isStopped():
-                        play_state = False
-                        fail_state = True
-                        
-                    screen.fill(Level.BG_COLOR)
-                    #myCar.addTargets(((resW / 2) - 107.5, botLaneY))
-                case 2:
-                    screen.fill((255, 200, 100))
-                case 3:
-                    screen.fill((100, 200, 255))
-                case 4:
-                    if lFour == None:
-                        #level 4
-                        lFour = LevelFour(screen, resW, resH)
-
-                    else: 
-                        pOrF = lFour.update(screen)
-                        if pOrF == "Pass":
-                            play_state = False
-                            pass_state = True
-                            print(pOrF)
-
-                        elif pOrF == "Fail":
-                            play_state = False
-                            fail_state = True
-                            print(pOrF)
-
-                case 5:
-                    if lFive == None:
-                        #level 5
-                        lFive = LevelFive(screen, resW, resH)
-                    
-                    else:
-                        pOrF = lFive.update(screen)
-                        if pOrF == "Pass":
-                            play_state = False
-                            pass_state = True
-                            print(pOrF)
-
-                        elif pOrF == "Fail":
-                            play_state = False
-                            fail_state = True
-                            print(pOrF)
-
-            display_score()
-            
-            pygame.display.flip()
+            status = level.update(screen)
+            if status == "Pass":
+                play_state = False
+                pass_state = True
+            elif status == "Fail":
+                play_state = False
+                fail_state = True
 
         if pause_state:
             screen.blit(pause_surf, pause_rect)
@@ -370,7 +278,7 @@ if __name__ == "__main__":
                 #get mouse position to check if mouse is over Play or Quit
                 mouse_pos = pygame.mouse.get_pos()
 
-                #checks if mouse is positioned over Play or Quit and if leck click is pressed
+                #checks if mouse is positioned over Play or Quit and if left click is pressed
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_state = pygame.mouse.get_pressed()
                     if mouse_state[0]:
@@ -399,6 +307,17 @@ if __name__ == "__main__":
                                 start_screen = True
                                 start_time = pygame.time.get_ticks()
                                 level_choice = i + 1
+                                match level_choice:
+                                    case 1:
+                                        level = levelone(screen, resW, resH)
+                                    case 2:
+                                        screen.fill((255, 200, 100))
+                                    case 3:
+                                        level = levelthree(screen, resW, resH)
+                                    case 4:
+                                        level = LevelFour(screen, resW, resH)
+                                    case 5:
+                                        level = LevelFive(screen, resW, resH)
                                 screen.fill('black')
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -434,20 +353,6 @@ if __name__ == "__main__":
                             if quit_title_rect.collidepoint(mouse_pos):
                                 pause_state = False
                                 title_state = True
-                                target_one = True
-                                target_two = False
-                                target_three = False
-                                botTurned = False
-                                if cars_group:
-                                    player.remove(playerCar)
-                                    BotCars.remove(myCar)
-                                    cars_group = False
-
-                                #if not cars_group:
-                                    #if (x_flip):
-                                        #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY), 180), BotCar((botLaneX, botLaneY)))
-                                    #else:
-                                        #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY)), BotCar((botLaneX, botLaneY), 180))
                                 paused_time = 0
 
                             if quit_desktop_rect.collidepoint(mouse_pos):
