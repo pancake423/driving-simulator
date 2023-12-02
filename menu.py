@@ -1,14 +1,11 @@
 #import libraries from pygame extension
 import pygame
 
-#import classes PlayerCar and BotCar from cars.py
-from cars import PlayerCar, BotCar
-
-#import classes Level, RectSprite, ImageSprite, & RoadLane
-from levels import Level, RectSprite, ImageSprite, RoadLane, Level
+#import classes Level
+from levels import Level
 
 #import levels
-from levelTut import level_Tutorial
+#from levelTut import Tutorial
 from Level1 import levelone
 from level3 import levelthree
 from Level4 import LevelFour
@@ -19,23 +16,6 @@ def display_score(x_axis = 25, y_axis = 25):
     score_surf = menu_font.render(current_time, False, (221, 73, 73))
     score_rect = score_surf.get_rect(topleft = (x_axis, y_axis))
     screen.blit(score_surf, score_rect)
-
-def display_speed(player_car, is_x_flipped):
-    if is_x_flipped:
-        player_speed = "Speed: {0:.2g}".format((-1) * playerCar.getSpeed())
-    else:
-        player_speed = "Speed: {0:.2g}".format(playerCar.getSpeed())
-    speed_surf = menu_font.render(player_speed, False, (221, 73, 73))
-    speed_rect = speed_surf.get_rect(bottomleft = (25, resH - 25))
-    screen.blit(speed_surf, speed_rect)
-
-def refresh_cars(player_car, bot_car):
-    BotCars.add(bot_car)
-    player.add(player_car)
-    player_car.setCollide([BotCars])
-    bot_car.setCollide([player])  
-    return player_car, bot_car
-
 
 
 #initailize clock for the game
@@ -98,10 +78,6 @@ pass_state = False
 #set end_state to False to control level end portion of game loop, resets levels so they can be restarted
 end_state = False
 
-botTurned = False
-
-cars_group = False
-
 #set amount of levels
 level_count = 5
 level_choice = 0
@@ -163,7 +139,7 @@ for i in range(level_count):
 fail_surf = menu_font.render(game_fail, False, 'red')
 fail_rect = fail_surf.get_rect(midtop = (resW / 2, 25))
 pass_surf = menu_font.render(game_pass, False, 'red')
-pass_rect = menu_font.render(game_pass, False, 'red')
+pass_rect = pass_surf.get_rect(midtop = (resW / 2, 25))
 retry_surf = menu_font.render(ask_retry, False, 'red')
 retry_rect = retry_surf.get_rect(midtop = (resW / 2, 100))
 
@@ -374,17 +350,6 @@ if __name__ == "__main__":
                                 target_one = True
                                 target_two = False
                                 target_three = False
-                                botTurned = False
-                                if cars_group:
-                                    player.remove(playerCar)
-                                    BotCars.remove(myCar)
-                                    cars_group = False
-
-                                #if not cars_group:
-                                    #if (x_flip):
-                                        #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY), 180), BotCar((botLaneX, botLaneY)))
-                                    #else:
-                                        #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY)), BotCar((botLaneX, botLaneY), 180))
                                 paused_time = 0
 
                             if quit_desktop_rect.collidepoint(mouse_pos):
@@ -401,7 +366,6 @@ if __name__ == "__main__":
                     target_one = True
                     target_two = False
                     target_three = False
-                    botTurned = False
                     paused_time = 0
                     match level_choice:
                         case 1:
@@ -415,15 +379,6 @@ if __name__ == "__main__":
                         case 5:
                             level = LevelFive(screen, resW, resH)
 
-                    if cars_group:
-                        player.remove(playerCar)
-                        BotCars.remove(myCar)
-                        cars_group = False
-                    #if not cars_group:
-                        #if (x_flip):
-                            #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY), 180), BotCar((botLaneX, botLaneY)))
-                        #else:
-                            #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY)), BotCar((botLaneX, botLaneY), 180))
                     start_time = pygame.time.get_ticks()
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
@@ -432,18 +387,8 @@ if __name__ == "__main__":
                     target_one = True
                     target_two = False
                     target_three = False
-                    botTurned = False
                     paused_time = 0
-                    if cars_group:
-                        player.remove(playerCar)
-                        BotCars.remove(myCar)
-                        cars_group = False
-                    #if not cars_group:
-                        #if (x_flip):
-                            #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY), 180), BotCar((botLaneX, botLaneY)))
-                        #else:
-                            #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY)), BotCar((botLaneX, botLaneY), 180))
-
+                    
         #----end event loop----
 
         #update screen with a background
