@@ -371,20 +371,6 @@ if __name__ == "__main__":
                                 pause_state = False
                                 title_state = True
                                 paused_level_screen = False
-                                target_one = True
-                                target_two = False
-                                target_three = False
-                                botTurned = False
-                                if cars_group:
-                                    player.remove(playerCar)
-                                    BotCars.remove(myCar)
-                                    cars_group = False
-
-                                #if not cars_group:
-                                    #if (x_flip):
-                                        #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY), 180), BotCar((botLaneX, botLaneY)))
-                                    #else:
-                                        #playerCar, myCar = refresh_cars(PlayerCar((topLaneX, topLaneY)), BotCar((botLaneX, botLaneY), 180))
                                 paused_time = 0
 
                             if quit_desktop_rect.collidepoint(mouse_pos):
