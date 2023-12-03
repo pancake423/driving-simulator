@@ -11,6 +11,9 @@ class Tutorial(Level):
 
         super().__init__(screen_w, screen_h)
 
+        #flags
+        self.stopped_at_sign = False
+
         #add the level, a t-intersection, to the tutorial level
         self.add_t_intersection(screen_w / 2, screen_h / 2, entrance="left")
         self.add_horizontal_road(screen_w / 2 - 108, 0, screen_h / 2)
@@ -36,6 +39,26 @@ class Tutorial(Level):
         #set collision(s) for the player and the bot car(s)
         self.playerCar.setCollide([self.bots])
         self.botCar1.setCollide([self.player])
+        self.botCar2.setCollide([self.player])
+
+    def check_bots(self):
+        if self.botCar1.rect.y <= -100:
+            self.bots.remove(self.botCar1)
+            self.botCar1.kill()
+            self.botCar1 = BotCar((screen_w / 2 + 65, screen_h + 100), 270)
+            self.botCar1.setTarget(((screen_w / 2 + 65, -100), False))
+            self.bots.add(self.botCar1)
+            self.botCar1.setCollide([self.player])
+            self.playerCar.setCollide([self.bots])
+
+        if self.botCar2.rect.y >= screen_h + 100:
+            self.bots.remove(self.botCar2)
+            self.botCar2.kill()
+            self.botCar2 = BotCar((screen_w / 2 - 65, -100), 90)
+            self.botCar2.setTarget(((screen_w / 2 - 65, screen_h + 100), False))
+            self.bots.add(self.botCar2)
+            self.botCar2.setCollide([self.player])
+            self.playerCar.setCollide([self.bots])
 
     #update prints all the elements of the level to the screen as well as
     #checking pass/fail conditions of the level and returning pass/fail
@@ -47,14 +70,22 @@ class Tutorial(Level):
         self.player.draw(screen)
         self.player.update()
         
+        self.check_bots()
 
+        #records time
+        timer = pygame.time.get_ticks()
+
+        #set collision(s) for the player and the bot car(s)
+        self.playerCar.setCollide([self.bots])
+        self.botCar1.setCollide([self.player])
         #this checks that the player is on the road
         onRoad = self.get_targets(self.playerCar)
 
         #here be road rules
+        if (self.playerCar.rect.x > (self.width / 3)) and (self.playerCar.rect.x < (self.width / 2) + 108):
+            if (self.playerCar.getSpeed() == 0):
+                self.stopped_at_sign = True
 
-        #records time
-        timer = pygame.time.get_ticks()
         if self.playerCar.isStopped():
             #wait 3 seconds to allow explosion visual and sound to play
             if (pygame.time.get_ticks() - timer) > 3000:
@@ -83,8 +114,11 @@ class Tutorial(Level):
             if (self.playerCar.rect.x < (self.width / 2) - 50):
                 print("Crossed median fail")
                 return "Fail"
+            elif not self.stopped_at_sign:
+                print("Stop Fail")
+                return "Fail"
         
-        if self.playerCar.rect.y > (self.width + 50):
+        if self.playerCar.rect.y > (self.height + 50) or self.playerCar.rect.y < -50:
             print("Passed")
             return "Pass"
         
