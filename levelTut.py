@@ -7,7 +7,7 @@ class Tutorial(Level):
     level_overview = "Learn to control the vehicle, drive forward, back, stop, and turn."
 
     #set font to 'Get Now.ttf', a free font found online
-    font = pygame.font.Font('Get Now.ttf', 50)
+    font = pygame.font.Font('fonts/Get Now.ttf', 50)
 
     #initialize/build the level
     def __init__(self, screen, screen_w, screen_h):

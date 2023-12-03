@@ -4,6 +4,9 @@ import pygame
 #import classes Level
 from levels import Level
 
+#initialize pygame fonts
+pygame.font.init()
+
 #import levels
 from levelTut import Tutorial
 from Level1 import levelone
@@ -20,9 +23,6 @@ def display_score(x_axis = 25, y_axis = 25):
 
 #initailize clock for the game
 clock = pygame.time.Clock()
-
-#initialize pygame fonts
-pygame.font.init()
 
 start_time = 0
 time_at_pause = 0
