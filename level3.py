@@ -164,6 +164,11 @@ class levelthree(Level):
         else:
             return "NA"
 
+    def pause(self):
+        self.pauseTime = pygame.time.get_ticks()
+        
+    def resume(self):
+        self.timer += pygame.time.get_ticks() - self.pauseTime
 
 """
 def level_Three(screen, screen_width, screen_height):
