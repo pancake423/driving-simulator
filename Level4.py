@@ -69,6 +69,14 @@ class LevelFour(Level):
                 return "Pass"
         
         return "NA"
+    
+    def pause(self):
+        self.pauseTime = pygame.time.get_ticks()
+        print(f"Paused at {self.pauseTime}")
+        
+    def resume(self):
+        self.startTime += pygame.time.get_ticks() - self.pauseTime
+        print(f"Resumed, adding {pygame.time.get_ticks() - self.pauseTime}ms")
 
 """
 def level_Four(screen, screen_width, screen_height):

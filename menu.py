@@ -301,7 +301,6 @@ if __name__ == "__main__":
                     level_state = False
                     paused_level_screen = True
 
-
             if start_screen:
                 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -314,6 +313,10 @@ if __name__ == "__main__":
                     time_at_pause = pygame.time.get_ticks()
                     pause_state = True
                     play_state = False
+                    try:
+                        level.pause()
+                    except:
+                        print("Pause method not found, Pausing may break timers")
 
             if pause_state:
                 mouse_pos = pygame.mouse.get_pos()
@@ -325,6 +328,10 @@ if __name__ == "__main__":
                                 paused_time += pygame.time.get_ticks() - time_at_pause
                                 play_state = True
                                 pause_state = False
+                                try:
+                                    level.resume()
+                                except:
+                                    print("Resume method not found, Pausing may break timers")
                                 
                             if quit_title_rect.collidepoint(mouse_pos):
                                 pause_state = False
@@ -347,10 +354,6 @@ if __name__ == "__main__":
                                 pause_state = False
                                 title_state = True
                                 paused_level_screen = False
-                                target_one = True
-                                target_two = False
-                                target_three = False
-                                paused_time = 0
 
                             if quit_desktop_rect.collidepoint(mouse_pos):
                                 pause_state = False
