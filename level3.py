@@ -87,7 +87,7 @@ class levelthree(Level):
         
         #variables for timer
         self.carsGone = 0
-        self.timer = pygame.time.get_ticks()
+        self.timer = None
 
     def update(self,screen):
         # Clear the screen
@@ -103,6 +103,10 @@ class levelthree(Level):
         screen.blit(self.stopSign, (1090, 350))
         screen.blit(self.stopSign, (760, 350))
         
+        # Initialize timer
+        if self.timer == None:
+            self.time = pygame.time.get_ticks()
+            
         if self.carsGone == 0 and self.botCar.newTarget() and (pygame.time.get_ticks() - self.timer()) / 1000 > 2:
             self.timer = pygame.time.get_ticks()
         if (pygame.time.get_ticks() - self.timer) / 1000 > 2:
