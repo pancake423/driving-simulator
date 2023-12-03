@@ -20,6 +20,7 @@ class Tutorial(Level):
         self.explain = True #used to pause the level and display explanation of controls until user input
 
         #0 is stop at sign, 1 is reverse back off-screen, 2 is stop at sign then turn left, 3 is stop at sign and turn right
+        #-1 denotes the end of the level
         self.stage = 0 #used to update the tutorial to the next stage after completing an objective
 
         #stage explanations 
@@ -75,10 +76,13 @@ class Tutorial(Level):
     def stage_instuctions(self, screen, stage_part_1, stage_part_2, stage_part_3):
         self.stage_part_1_surf = self.font.render(stage_part_1, False, 'red')
         self.stage_part_1_rect = self.stage_surf.get_rect(midtop = (self.width / 2, 200))
-        self.stage_part_2_surf = self.font.render(stage_part_1, False, 'red')
+        self.stage_part_2_surf = self.font.render(stage_part_2, False, 'red')
         self.stage_part_2_rect = self.stage_surf.get_rect(midtop = (self.width / 2, 275))
-        self.stage_part_3_surf = self.font.render(stage_part_1, False, 'red')
+        self.stage_part_3_surf = self.font.render(stage_part_3, False, 'red')
         self.stage_part_3_rect = self.stage_surf.get_rect(midtop = (self.width / 2, 350))
+        screen.blit(self.stage_part_1_surf, self.stage_part_1_rect)
+        screen.blit(self.stage_part_2_surf, self.stage_part_2_rect)
+        screen.blit(self.stage_part_3_surf, self.stage_part_3_rect)
 
     def check_bots(self):
         if self.botCar1.rect.y <= -100:
@@ -107,12 +111,24 @@ class Tutorial(Level):
 
         if self.explain:
             screen.fill(self.BG_COLOR)
-            screen.blit(self.stage_part_1_surf, self.stage_part_1_rect)
-            screen.blit(self.stage_part_2_surf, self.stage_part_2_rect)
-            screen.blit(self.stage_part_3_surf, self.stage_part_3_rect)
+
             if pygame.KEYDOWN:
                 self.explain = False
                 self.play = True
+            match self.stage:
+                case 0:
+                    self.stage_instructions(self.stage00, self.stage01, self.stage02)
+                    self.stage = 1
+                case 1:
+                    self.stopped_at_sign = False
+                    self.stage_instructions(self.stage10, self.stage11, self.stage12)
+                    self.stage = 2
+                case 2:
+                    self.stage_instructions(self.stage20, self.stage21, self.stage22)
+                    self.stage = 3
+                case 3:
+                    self.stage_instructions(self.stage30, self.stage31, self.stage32)
+                    self.stage = -1
 
         if self.play:
 
@@ -127,6 +143,14 @@ class Tutorial(Level):
                     if (self.playerCar.rect.x > (self.width / 3)) and (self.playerCar.rect.x < (self.width / 2) + 108):
                         if (self.playerCar.getSpeed() == 0):
                             self.stopped_at_sign = True
+                            self.stage = 1
+                            self.play = False
+                            self.explain = True
+                case 1:
+                    if (self.playerCar.rect.x < self.width):
+                        self.stage = 2
+                        self.play = False
+                        self.explain = True
             
             self.check_bots()
 
