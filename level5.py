@@ -116,7 +116,7 @@ if __name__ == "__main__":
     pygame.init()
     screen_width = 1920
     screen_height = 1080
-    screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN | pygame.SCALED)
     
     clock = pygame.time.Clock()
     level = LevelFive(screen,screen_width,screen_height)

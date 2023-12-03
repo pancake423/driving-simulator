@@ -88,7 +88,7 @@ resH = 1080
 resCH = 420
 
 #set the screen using resW and resH as arguments
-screen = pygame.display.set_mode((resW, resH), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((resW, resH), pygame.FULLSCREEN | pygame.SCALED)
 
 #set background image for title menu
 background = pygame.image.load('assets/standard-road.png')
