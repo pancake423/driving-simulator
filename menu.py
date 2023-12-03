@@ -5,7 +5,7 @@ import pygame
 from levels import Level
 
 #import levels
-#from levelTut import Tutorial
+from levelTut import Tutorial
 from Level1 import levelone
 from level3 import levelthree
 from Level4 import LevelFour
@@ -285,9 +285,9 @@ if __name__ == "__main__":
                                 level_choice = i + 1
                                 match level_choice:
                                     case 1:
-                                        level = levelone(screen, resW, resH)
+                                        level = Tutorial(screen, resW, resH)
                                     case 2:
-                                        screen.fill((255, 200, 100))
+                                        level = levelone(screen, resW, resH)
                                     case 3:
                                         level = levelthree(screen, resW, resH)
                                     case 4:
