@@ -25,7 +25,7 @@ class LevelFour(Level):
         self.botCar.setCollide([self.playerGroup])
         
         self.botTurned = False
-        self.startTime = pygame.time.get_ticks()
+        self.startTime = None
         
     def update(self, screen):
         self.draw(screen, 0, 0)
@@ -41,6 +41,8 @@ class LevelFour(Level):
         playerX, playerY = playerPos
         botX, botY = botPos
         
+        if self.startTime == None:
+            self.startTime = pygame.time.get_ticks()
         timePassed = (pygame.time.get_ticks() - self.startTime) / 1000
         
         roads = self.get_targets(self.playerCar)
