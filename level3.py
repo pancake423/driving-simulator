@@ -105,7 +105,7 @@ class levelthree(Level):
         
         # Initialize timer
         if self.timer == None:
-            self.time = pygame.time.get_ticks()
+            self.timer = pygame.time.get_ticks()
             
         if self.carsGone == 0 and self.botCar.newTarget() and (pygame.time.get_ticks() - self.timer()) / 1000 > 2:
             self.timer = pygame.time.get_ticks()
