@@ -127,6 +127,39 @@ class levelthree(Level):
         self.botGroup.update()
         self.playerGroup.draw(screen)
         self.botGroup.draw(screen)
+#Road Rules
+        roads = self.get_targets(self.playerCar)#Checks if player is on the road
+        
+        timer = pygame.time.get_ticks()
+        if self.playerCar.isStopped():
+            #waits 3 seconds before failing so player can see the explosion
+            if (pygame.time.get_ticks() - timer) > 3000:
+                return "Fail"
+        
+        #if player is offroad or between roads for more than a second, fail
+        if len(roads) != 1:
+            if bool(self.playerCar.isOffRoad()) == False:
+                self.playerCar.offRoad = True
+                self.offRoadTimer = pygame.time.get_ticks()
+                
+            else:
+                if pygame.time.get_ticks() - self.offRoadTimer >= 1000:
+                    return "Fail"
+            
+        else:
+            self.playerCar.offRoad = False
+            
+        #if player goes past the median, fail
+        if self.playerCar.rect.y < (self.height/3):
+            return "Fail"
+            
+        #If player successfully merges and continues to the right, pass
+        if self.playerCar.rect.x > self.width + 50:
+            return "Pass"
+        
+        else:
+            return "NA"
+
 
 """
 def level_Three(screen, screen_width, screen_height):
