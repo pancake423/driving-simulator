@@ -169,6 +169,7 @@ class levelthree(Level):
         
     def resume(self):
         self.timer += pygame.time.get_ticks() - self.pauseTime
+        self.offRoadTimer += pygame.time.get_ticks() - self.pauseTime
 
 """
 def level_Three(screen, screen_width, screen_height):
