@@ -203,6 +203,7 @@ class Tutorial(Level):
         
 if __name__ == "__main__":
     pygame.init()
+    pygame.font.init()
     screen_w = 1920
     screen_h = 1080
 
