@@ -77,12 +77,13 @@ class levelone(Level):
         self.add_horizontal_road(sh_start_x, sh_end_x, sh_y)
         self.add_vertical_road(x1, v_st_1, v_end_1)
         self.add_vertical_road(x2, v_st_2, v_end_2)
-        self.add_intersection(inter_x, inter_y)
+        #self.add_intersection(inter_x, inter_y)
         self.add_random_decorations(50)
         
         
         #Adds stop sign
-        self.add_4_way_light(inter_x, inter_y)
+        #Will note: changed light for stop for the demo.
+        self.add_4_way_stop(inter_x, inter_y)
         
         #variables for timer
         self.carsGone = 0
