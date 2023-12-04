@@ -372,9 +372,9 @@ if __name__ == "__main__":
                     paused_time = 0
                     match level_choice:
                         case 1:
-                            level = levelone(screen, resW, resH)
+                            level = Tutorial(screen, resW, resH)
                         case 2:
-                            screen.fill((255, 200, 100))
+                            level = levelone(screen, resW, resH)
                         case 3:
                             level = levelthree(screen, resW, resH)
                         case 4:
