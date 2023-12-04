@@ -12,7 +12,7 @@ class Tutorial(Level):
         super().__init__(screen_w, screen_h)
 
         #set font to 'Get Now.ttf', a free font found online
-        font = pygame.font.Font('fonts/Get Now.ttf', 50)
+        self.font = pygame.font.Font('fonts/Get Now.ttf', 50)
     
         #flags
         self.stopped_at_sign = False #used to check if player stopped at the stop sign
@@ -73,7 +73,7 @@ class Tutorial(Level):
         self.botCar1.setCollide([self.player])
         self.botCar2.setCollide([self.player])
 
-    def stage_instuctions(self, screen, stage_part_1, stage_part_2, stage_part_3):
+    def stage_instructions(self, screen, stage_part_1, stage_part_2, stage_part_3):
         self.stage_part_1_surf = self.font.render(stage_part_1, False, 'red')
         self.stage_part_1_rect = self.stage_surf.get_rect(midtop = (self.width / 2, 200))
         self.stage_part_2_surf = self.font.render(stage_part_2, False, 'red')
@@ -117,17 +117,17 @@ class Tutorial(Level):
                 self.play = True
             match self.stage:
                 case 0:
-                    self.stage_instructions(self.stage00, self.stage01, self.stage02)
+                    self.stage_instructions(screen, self.stage00, self.stage01, self.stage02)
                     self.stage = 1
                 case 1:
                     self.stopped_at_sign = False
-                    self.stage_instructions(self.stage10, self.stage11, self.stage12)
+                    self.stage_instructions(screen, self.stage10, self.stage11, self.stage12)
                     self.stage = 2
                 case 2:
-                    self.stage_instructions(self.stage20, self.stage21, self.stage22)
+                    self.stage_instructions(screen, self.stage20, self.stage21, self.stage22)
                     self.stage = 3
                 case 3:
-                    self.stage_instructions(self.stage30, self.stage31, self.stage32)
+                    self.stage_instructions(screen, self.stage30, self.stage31, self.stage32)
                     self.stage = -1
 
         if self.play:
