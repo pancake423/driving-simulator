@@ -126,11 +126,10 @@ class Tutorial(Level):
     def update(self, screen):
 
         if self.explain:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    print("Input detected.")
-                    self.explain = False
-                    self.play = True
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                self.explain = False
+                self.play = True
 
             screen.fill(self.BG_COLOR)
 
