@@ -18,6 +18,7 @@ class Tutorial(Level):
         self.stopped_at_sign = False #used to check if player stopped at the stop sign
         self.play = False #used to allow the level to play after the player has read the instructions
         self.explain = True #used to pause the level and display explanation of controls until user input
+        self.need_reset = False #used to reset the player car when a fail condition has been achieved
 
         #0 is stop at sign, 1 is reverse back off-screen, 2 is stop at sign then turn left, 3 is stop at sign and turn right
         #-1 denotes the end of the level
@@ -37,6 +38,7 @@ class Tutorial(Level):
         self.stage30 = "You did it? You did it, of course you did it, I never doubted you. I swear!"
         self.stage31 = "Now, the final test. Stop at the stop sign, then turn left (left arrow or 'a')."
         self.stage32 = "Do that, and I'll be reeaaalllly impressed."
+        self.stage_retry = "Try again."
 
         #surfaces and rectangles for stage explanations
         self.stage_part_1_surf = None
@@ -103,6 +105,15 @@ class Tutorial(Level):
             self.botCar2.setCollide([self.player])
             self.playerCar.setCollide([self.bots])
 
+    def reset_player(self):
+        self.player.remove(self.playerCar)
+        self.playerCar.kill()
+        self.playerCar = PlayerCar((60, (screen_h / 2) + 65), 0)
+        self.player.add(self.playerCar)
+        self.playerCar.setCollide([self.bots])
+        self.botCar1.setCollide([self.player])
+        self.botCar2.setCollide([self.player])
+
 
     #update prints all the elements of the level to the screen as well as
     #checking pass/fail conditions of the level and returning pass/fail
@@ -117,18 +128,20 @@ class Tutorial(Level):
                 self.play = True
             match self.stage:
                 case 0:
-                    self.stage_instructions(screen, self.stage00, self.stage01, self.stage02)
-                    self.stage = 1
+                    self.stage_instructions(self.stage00, self.stage01, self.stage02)
                 case 1:
                     self.stopped_at_sign = False
-                    self.stage_instructions(screen, self.stage10, self.stage11, self.stage12)
-                    self.stage = 2
+                    self.stage_instructions(self.stage10, self.stage11, self.stage12)
                 case 2:
-                    self.stage_instructions(screen, self.stage20, self.stage21, self.stage22)
-                    self.stage = 3
+                    if self.needs_reset:
+                        self.reset_player()
+                        self.stage_instructions(self.stage_retry, self.stage21, self.stage22)
+
+                    else:
+                        self.stage_instructions(self.stage20, self.stage21, self.stage22)
+                    
                 case 3:
-                    self.stage_instructions(screen, self.stage30, self.stage31, self.stage32)
-                    self.stage = -1
+                    self.stage_instructions(self.stage30, self.stage31, self.stage32)
 
         if self.play:
 
@@ -138,19 +151,36 @@ class Tutorial(Level):
             self.bots.update()
             self.player.draw(screen)
             self.player.update()
+            if (self.playerCar.rect.x > (self.width / 3)) and (self.playerCar.rect.x < (self.width / 2) + 108):
+                if (self.playerCar.getSpeed() == 0):
+                    self.stopped_at_sign = True
+
             match self.stage:
                 case 0:
-                    if (self.playerCar.rect.x > (self.width / 3)) and (self.playerCar.rect.x < (self.width / 2) + 108):
-                        if (self.playerCar.getSpeed() == 0):
-                            self.stopped_at_sign = True
-                            self.stage = 1
-                            self.play = False
-                            self.explain = True
+                    if self.stopped_at_sign:
+                        self.stage = 1
+                        self.play = False
+                        self.explain = True
+
                 case 1:
                     if (self.playerCar.rect.x < self.width):
                         self.stage = 2
                         self.play = False
                         self.explain = True
+
+                case 2:
+                    if self.playerCar.getAngle() >= 100 and self.stopped_at_sign:
+                        self.needs_reset = True
+                        self.play = False
+                        self.explain = True
+                        
+                    if self.playerCar.rect.y > (self.height + 100) and self.stopped_at_sign:
+                        self.stage = 3
+                        self.play = False
+                        self.explain = True
+
+                case 3:
+                    if (self.playerCar.rect.x > self.width):
             
             self.check_bots()
 
