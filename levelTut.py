@@ -12,18 +12,22 @@ class Tutorial(Level):
         super().__init__(screen_w, screen_h)
 
         #set font to 'Get Now.ttf', a free font found online
-        self.font = pygame.font.Font('fonts/Get Now.ttf', 25)
+        self.font = pygame.font.Font('fonts/Get Now.ttf', 30)
     
         #flags
         self.stopped_at_sign = False #used to check if player stopped at the stop sign
         self.play = False #used to allow the level to play after the player has read the instructions
         self.explain = True #used to pause the level and display explanation of controls until user input
         self.paused = False #used to preserve the offRoad timer if game is paused, in case player pauses when offRoad
-        self.stage_0_pass = False
-        self.stage_1_pass = False
-        self.stage_2_pass = False
-        self.stage_3_pass = False
+        self.stage_0_pass = False #used to control the first stage of the level
+        self.stage_1_pass = False #used to control the second stage of the level
+        self.stage_2_pass = False #used to control the third stage of the level
+        self.stage_3_pass = False #used to control the fourth stage of the level
         self.needs_reset = False #used to reset the player car when a fail condition has been achieved
+        self.stage_collided = False #used to determine if a collision has occured
+        self.stage_median_crossed = False #used to determine if a median has been crossed
+        self.stage_cant_stop_wont_stop = False #used to determine if the player did not stop at the stop sign
+        self.stage_offroader = False #used to determine if the player decided to go on a journey offroad
 
         #0 is stop at sign, 1 is reverse back off-screen, 2 is stop at sign then turn left, 3 is stop at sign and turn right
         #-1 denotes the end of the level
@@ -43,7 +47,11 @@ class Tutorial(Level):
         self.stage30 = "You did it? You did it, of course you did it, I never doubted you. I swear!"
         self.stage31 = "Now, the final test. Stop at the stop sign, then turn left (left arrow or 'a')."
         self.stage32 = "Do that, and I'll be reeaaalllly impressed."
-        self.stage_retry = "Try again."
+        self.stage_retry = "Oops. Try again."
+        self.stage_collision_fail = "WATCH THE TRAFFIC! You could have killed someone if this wasn't a game."
+        self.stage_median_cross_fail = "Hey, now. Get off your phone. Watch the road."
+        self.stage_offroad_fail = "I'm pretty sure this car isn't made for offroad journeys."
+        self.stage_no_stop_fail = "To quote the great Filthy Franku, 'It's time to STOP'... the car. At the sign. That says STOP."
 
         #surfaces and rectangles for stage explanations
         self.stage_part_1_surf = None
@@ -94,6 +102,23 @@ class Tutorial(Level):
         screen.blit(self.stage_part_1_surf, self.stage_part_1_rect)
         screen.blit(self.stage_part_2_surf, self.stage_part_2_rect)
         screen.blit(self.stage_part_3_surf, self.stage_part_3_rect)
+        #pygame.display.update()
+
+    def reset_bots(self):
+        self.bots.remove(self.botCar1)
+        self.bots.remove(self.botCar2)
+        self.botCar1.kill()
+        self.botCar2.kill()
+        self.botCar1 = BotCar((self.width / 2 + 65, self.height + 100), 270)
+        self.botCar2 = BotCar((self.width / 2 - 65, -100), 90)
+        self.botCar1.setTarget(((self.width / 2 + 65, -100), False))
+        self.botCar2.setTarget(((self.width / 2 + 65, self.height + 100), False))
+        self.bots.add(self.botCar1)
+        self.bots.add(self.botCar2)
+        self.botCar1.setCollide([self.player])
+        self.botCar2.setCollide([self.player])
+        self.playerCar.setCollide([self.bots])
+
 
     def check_bots(self):
         if self.botCar1.rect.y <= -100:
@@ -123,6 +148,14 @@ class Tutorial(Level):
         self.botCar1.setCollide([self.player])
         self.botCar2.setCollide([self.player])
 
+    def reset_player_reverse_stage(self):
+        self.player.remove(self.playerCar)
+        self.playerCar.kill()
+        self.playerCar = PlayerCar((777, (self.height / 2) + 65), 0)
+        self.player.add(self.playerCar)
+        self.playerCar.setCollide([self.bots])
+        self.botCar1.setCollide([self.player])
+        self.botCar2.setCollide([self.player])
 
     #update prints all the elements of the level to the screen as well as
     #checking pass/fail conditions of the level and returning pass/fail
@@ -134,32 +167,84 @@ class Tutorial(Level):
                     print("Input detected.")
                     self.explain = False
                     self.play = True
+                    self.needs_reset = False
+                    self.stage_collided = False
+                    self.stage_median_crossed = False
+                    self.stage_cant_stop_wont_stop = False
+                    self.stage_offroader = False
 
             screen.fill(self.BG_COLOR)
 
             match self.stage:
                 case 0:
-                    self.stage_instructions(screen, self.stage00, self.stage01, self.stage02)
+                    if self.needs_reset and not self.stage_0_pass:
+                        self.reset_player()
+                        if self.stage_collided:
+                            self.stage_instructions(screen, self.stage_collision_fail, self.stage01, self.stage02)
+                            self.reset_bots()
+                        elif self.stage_median_crossed:
+                            self.stage_instructions(screen, self.stage_median_cross_fail, self.stage01, self.stage02)
+                        elif self.stage_cant_stop_wont_stop:
+                            self.stage_instructions(screen, self.stage_no_stop_fail, self.stage01, self.stage02)
+                        elif self.stage_offroader:
+                            self.stage_instructions(screen, self.stage_offroad_fail, self.stage01, self.stage02)
+                        else:
+                            self.stage_instructions(screen, self.stage_retry, self.stage01, self.stage02)
+                    else:
+                        self.stage_instructions(screen, self.stage00, self.stage01, self.stage02)
 
                 case 1:
-                    self.stopped_at_sign = False
-                    self.stage_instructions(screen, self.stage10, self.stage11, self.stage12)
+                    if self.needs_reset and not self.stage_1_pass: 
+                        self.reset_player_reverse_stage()
+                        if not self.stage_1_pass:
+                            if self.stage_collided:
+                                self.stage_instructions(screen, self.stage_collision_fail, self.stage11, self.stage12)
+                                self.reset_bots()
+                            elif self.stage_median_crossed:
+                                self.stage_instructions(screen, self.stage_median_cross_fail, self.stage11, self.stage12)
+                            elif self.stage_cant_stop_wont_stop:
+                                self.stage_instructions(screen, self.stage_no_stop_fail, self.stage11, self.stage12)
+                            elif self.stage_offroader:
+                                self.stage_instructions(screen, self.stage_offroad_fail, self.stage11, self.stage12)
+                            else:
+                                self.stage_instructions(screen, self.stage_retry, self.stage11, self.stage12)
+                    else:
+                        self.stopped_at_sign = False
+                        self.stage_instructions(screen, self.stage10, self.stage11, self.stage12)
 
                 case 2:
-                    if self.needs_reset:
+                    if self.needs_reset and not self.stage_2_pass:
                         self.reset_player()
-                        self.needs_reset = False
-                        self.stage_instructions(screen, self.stage_retry, self.stage21, self.stage22)
-
+                        if not self.stage_2_pass:
+                            if self.stage_collided:
+                                self.stage_instructions(screen, self.stage_collision_fail, self.stage21, self.stage22)
+                                self.reset_bots()
+                            elif self.stage_median_crossed:
+                                self.stage_instructions(screen, self.stage_median_cross_fail, self.stage21, self.stage22)
+                            elif self.stage_cant_stop_wont_stop:
+                                self.stage_instructions(screen, self.stage_no_stop_fail, self.stage21, self.stage22)
+                            elif self.stage_offroader:
+                                self.stage_instructions(screen, self.stage_offroad_fail, self.stage21, self.stage22)
+                            else:
+                                self.stage_instructions(screen, self.stage_retry, self.stage21, self.stage22)
                     else:
                         self.stage_instructions(screen, self.stage20, self.stage21, self.stage22)
                             
                 case 3:
-                    if self.needs_reset:
+                    if self.needs_reset and not self.stage_3_pass:
                         self.reset_player()
-                        self.needs_reset = False
-                        self.stage_instructions(screen, self.stage30, self.stage31, self.stage32)
-
+                        if not self.stage_3_pass:
+                            if self.stage_collided:
+                                self.stage_instructions(screen, self.stage_collision_fail, self.stage31, self.stage32)
+                                self.reset_bots()
+                            elif self.stage_median_crossed:
+                                self.stage_instructions(screen, self.stage_median_cross_fail, self.stage31, self.stage32)
+                            elif self.stage_cant_stop_wont_stop:
+                                self.stage_instructions(screen, self.stage_no_stop_fail, self.stage31, self.stage32)
+                            elif self.stage_offroader:
+                                self.stage_instructions(screen, self.stage_offroad_fail, self.stage31, self.stage32)
+                            else:
+                                self.stage_instructions(screen, self.stage_retry, self.stage31, self.stage32)
                     else:
                         self.stage_instructions(screen, self.stage30, self.stage31, self.stage32)
 
@@ -171,61 +256,16 @@ class Tutorial(Level):
             self.bots.update()
             self.player.draw(screen)
             self.player.update()
-            if (self.playerCar.rect.x > (self.width / 3)) and (self.playerCar.rect.x < (self.width / 2) + 108):
-                if (self.playerCar.getSpeed() == 0):
-                    self.stopped_at_sign = True
-
-            match self.stage:
-                case 0:
-                    print("Stage 0")
-                    if self.stopped_at_sign:
-                        self.stage = 1
-                        self.play = False
-                        self.explain = True
-
-                case 1:
-                    print("Stage 1")
-                    if (self.playerCar.rect.x < 0):
-                        self.stage = 2
-                        self.playerCar.velocity = 0
-                        self.play = False
-                        self.explain = True
-
-                case 2:
-                    print("Stage 2")
-                    if self.playerCar.getAngle() >= 110:
-                        self.needs_reset = True
-                        self.play = False
-                        self.explain = True
-                        
-                    if self.playerCar.rect.y > (self.height + 100) and self.stopped_at_sign:
-                        self.stage = 3
-                        self.needs_reset = True
-                        self.stopped_at_sign = False
-                        self.play = False
-                        self.explain = True
-
-                case 3:
-                    print("Stage 3")
-                    if self.playerCar.getAngle() <= 250 and self.playerCar.getAngle() >= 160:
-                        self.needs_reset = True
-                        self.play = False
-                        self.explain = True
-                        
-                    if self.playerCar.rect.y < (-100) and self.stopped_at_sign:
-                        self.stage = -1
-            
-            self.check_bots()
-
             #this checks that the player is on the road
             onRoad = self.get_targets(self.playerCar)
 
             #here be road rules  
             if self.playerCar.isStopped():
+                self.stage_collided = True
                 #wait 3 seconds to allow explosion visual and sound to play
                 if (pygame.time.get_ticks() - self.crashTimer) >= 3000:
                     print("Crashed fail")
-                    return "Fail"
+                    self.needs_reset = True
                 
             else:
                 self.crashTimer = pygame.time.get_ticks()
@@ -238,7 +278,8 @@ class Tutorial(Level):
                 else:
                     if pygame.time.get_ticks() - self.timeOffroad >= 3000:
                         print("Offroad fail")
-                        return "Fail"
+                        self.needs_reset = True
+                        self.stage_offroader = True
             
             else:
                 self.playerCar.offRoad = False
@@ -246,32 +287,119 @@ class Tutorial(Level):
             if self.playerCar.rect.x < self.width / 2 - 65:
                 if (self.playerCar.rect.y < (self.height / 2) - 50) and (self.playerCar.getAngle() < 90 or self.playerCar.getAngle() > 270):
                     print("Crossed median fail 1")
-                    return "Fail"
+                    self.needs_reset = True
+                    self.stage_median_crossed = True
             
             if self.playerCar.getAngle() >= 260 and self.playerCar.getAngle() <= 300:
                 if (self.playerCar.rect.x < (self.width / 2) - 65) and (self.playerCar.rect.x > (self.width / 3)):
                     print("Crossed median fail 2")
-                    return "Fail"
+                    self.needs_reset = True
+                    self.stage_median_crossed = True
                     
                 elif self.playerCar.rect.y >= self.height + 100 and not self.stopped_at_sign:
                     print("Stop Fail 1")
-                    return "Fail"
+                    self.needs_reset = True
+                    #self.stage_cant_stop_wont_stop = True
                     
             if self.playerCar.getAngle() <= 110 and self.playerCar.getAngle() >= 70:
                 if (self.playerCar.rect.x > (self.width / 2) + 65):
                     print("Crossed median fail 3")
-                    return "Fail"
+                    self.needs_reset = True
+                    self.stage_median_crossed = True
                     
                 elif self.playerCar.rect.y <= -100 and not self.stopped_at_sign:
                     print("Stop Fail 2")
-                    return "Fail"
+                    self.needs_reset = True
+                    #self.stage_cant_stop_wont_stop = True
             
+            if (self.playerCar.rect.x > (self.width / 3)) and (self.playerCar.rect.x < (self.width / 2) - 220):
+                if (self.playerCar.getSpeed() == 0):
+                    self.stopped_at_sign = True
+                else:
+                    self.stage_cant_stop_wont_stop = True
+
+            match self.stage:
+                case 0: 
+                    print("Stage 0")
+                    if self.stopped_at_sign:
+                        self.stage = 1
+                        self.stage_0_pass = True
+                        self.play = False
+                        self.explain = True
+
+                    elif (self.playerCar.rect.x > self.width / 2 - 220) and not self.stopped_at_sign:
+                        self.needs_reset = True
+                        self.stage_cant_stop_wont_stop = True
+                        self.play = False
+                        self.explain = True
+                    
+                    elif self.needs_reset:
+                        self.play = False
+                        self.explain = True
+
+                case 1:
+                    print("Stage 1")
+                    if (self.playerCar.rect.x < 0):
+                        self.stage = 2
+                        self.stage_1_pass = True
+                        self.playerCar.velocity = 0
+                        self.play = False
+                        self.explain = True
+
+                    elif (self.playerCar.rect.x > self.width / 2 - 220):
+                        self.needs_reset = True
+                        self.play = False
+                        self.explain = True
+
+                    elif self.needs_reset:
+                        self.play = False
+                        self.explain = True
+
+                case 2:
+                    print("Stage 2")
+                    if self.playerCar.rect.y > (self.height + 100) and self.stopped_at_sign:
+                        self.stage = 3
+                        self.stage_2_pass = True
+                        self.reset_player()
+                        self.stopped_at_sign = False
+                        self.play = False
+                        self.explain = True
+
+                    if self.playerCar.getAngle() >= 110:
+                        self.needs_reset = True
+                        self.play = False
+                        self.explain = True
+
+                    elif self.needs_reset:
+                        self.play = False
+                        self.explain = True
+
+                case 3:
+                    print("Stage 3")
+                    if self.playerCar.rect.y < (-100) and self.stopped_at_sign:
+                        self.stage = -1
+                        self.stage_3_pass = True
+
+                    if self.playerCar.getAngle() <= 250 and self.playerCar.getAngle() >= 160:
+                        self.needs_reset = True
+                        self.play = False
+                        self.explain = True
+
+                    elif self.needs_reset:
+                        self.play = False
+                        self.explain = True
+            
+            self.check_bots()
+
+            #print("Car center position: ", self.playerCar.getPos())
+            #print("Car rectangle: ", self.playerCar.getRect())
             if self.stage == -1:
                 print("Passed")
                 return "Pass"
             
-            else: 
+            else:
                 return "NA"
+
             
     def pause(self):
         self.pauseTime = pygame.time.get_ticks()
