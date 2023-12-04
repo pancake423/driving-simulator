@@ -6,14 +6,14 @@ class Tutorial(Level):
     level_title = "Stay on the Road!"
     level_overview = "Learn to control the vehicle, drive forward, back, stop, and turn."
 
-    #set font to 'Get Now.ttf', a free font found online
-    font = pygame.font.Font('fonts/Get Now.ttf', 50)
-
     #initialize/build the level
     def __init__(self, screen, screen_w, screen_h):
 
         super().__init__(screen_w, screen_h)
 
+        #set font to 'Get Now.ttf', a free font found online
+        font = pygame.font.Font('fonts/Get Now.ttf', 50)
+    
         #flags
         self.stopped_at_sign = False #used to check if player stopped at the stop sign
         self.play = False #used to allow the level to play after the player has read the instructions
