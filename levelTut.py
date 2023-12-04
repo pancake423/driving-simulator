@@ -39,7 +39,7 @@ class Tutorial(Level):
         self.stage01 = "Hold either up arrow or 'w' to drive the car forward. Hold space to stop the car."
         self.stage02 = "Press any key to continue from this and other following screens. (Note: not the 'any' key. It doesn't exist.)"
         self.stage10 = "You actually stopped at the sign? Wow. That's rare. Thank you."
-        self.stage11 = "Now, hold either down arrow or 'd' to reverse the car."
+        self.stage11 = "Now, hold either down arrow or 's' to reverse the car."
         self.stage12 = "It's like going forward, but backward!"
         self.stage20 = "That is illegal. Why did you listen to me? You didn't even check traffic behind you (probably)."
         self.stage21 = "I promise, this time, what I'm asking you to do is legal. In fact, it's required by law."
