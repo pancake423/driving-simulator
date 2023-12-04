@@ -59,7 +59,11 @@ class Tutorial(Level):
         self.add_vertical_road(screen_w / 2, screen_h / 2 - 108, 0)
         self.add_vertical_road(screen_w / 2, screen_h / 2 + 108, screen_h)
         self.add_random_decorations(20)
+
+        #timers and timer modifiers
         self.timeOffroad = pygame.time.get_ticks() #tracks time player is off the road, used to fail player in certain cases
+        self.pauseTime = 0
+        self.time
 
         #initialize the player car sprite
         self.player = pygame.sprite.GroupSingle()
@@ -125,11 +129,16 @@ class Tutorial(Level):
     #if one of these conditions is met, depending on the condition
     def update(self, screen):
 
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+
+
         if self.explain:
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE]:
-                self.explain = False
-                self.play = True
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    print("Input detected.")
+                    self.explain = False
+                    self.play = True
 
             screen.fill(self.BG_COLOR)
 
@@ -274,7 +283,7 @@ class Tutorial(Level):
         self.pauseTime = pygame.time.get_ticks()
         
     def resume(self):
-        self.timeOffroad += pygame.time.get_ticks() - self.pauseTime
+        self.timeOffroad += pygame.time.get_ticks() - (pygame.time.get_ticks() - self.pauseTime)
         
 if __name__ == "__main__":
     pygame.init()
