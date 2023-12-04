@@ -43,7 +43,7 @@ class LevelFive(Level):
         self.player.draw(screen)
         self.player.update()
         
-        if self.last_spawned = None:
+        if self.last_spawned == None:
             self.last_spawned = pygame.time.get_ticks()
         #Creates Bot Traffic
         self.botCount = 10
