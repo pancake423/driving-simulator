@@ -155,6 +155,12 @@ class levelone(Level):
         
         else:
             return "NA"
+        
+    def pause(self):
+        self.pauseTime = pygame.time.get_ticks()
+        
+    def resume(self):
+        self.startTime += pygame.time.get_ticks() - self.pauseTime
 
 if __name__ == "__main__":
     # Initialize pygame
