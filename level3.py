@@ -87,6 +87,7 @@ class levelthree(Level):
         
         #variables for timer
         self.carsGone = 0
+        self.crashTimer = 0
         self.timer = None
 
     def update(self,screen):
@@ -134,11 +135,12 @@ class levelthree(Level):
 #Road Rules
         roads = self.get_targets(self.playerCar)#Checks if player is on the road
         
-        timer = pygame.time.get_ticks()
         if self.playerCar.isStopped():
             #waits 3 seconds before failing so player can see the explosion
-            if (pygame.time.get_ticks() - timer) > 3000:
+            if (pygame.time.get_ticks() - self.crashTimer) > 3000:
                 return "Fail"
+        else:
+            self.crashTimer = pygame.time.get_ticks()
         
         #if player is offroad or between roads for more than a second, fail
         if len(roads) != 1:
