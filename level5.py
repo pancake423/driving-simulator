@@ -14,6 +14,7 @@ class LevelFive(Level):
         self.add_4_lane_with_on_ramp(0,screen_height/3,screen_width,screen_height/3,0,screen_height)
         self.add_random_decorations(20)
         self.offRoadTimer = pygame.time.get_ticks()
+        self.timer = 0
         
         #Player
         self.player = pygame.sprite.GroupSingle()
@@ -84,11 +85,12 @@ class LevelFive(Level):
         #Road Rules
         roads = self.get_targets(self.playerCar)#Checks if player is on the road
         
-        timer = pygame.time.get_ticks()
         if self.playerCar.isStopped():
             #waits 3 seconds before failing so player can see the explosion
-            if (pygame.time.get_ticks() - timer) > 3000:
+            if (pygame.time.get_ticks() - self.timer) > 3000:
                 return "Fail"
+        else:
+            self.timer = pygame.time.get_ticks()
         
         #if player is offroad or between roads for more than a second, fail
         if len(roads) != 1:

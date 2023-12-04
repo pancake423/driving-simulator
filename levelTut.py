@@ -18,7 +18,7 @@ class Tutorial(Level):
         self.stopped_at_sign = False #used to check if player stopped at the stop sign
         self.play = False #used to allow the level to play after the player has read the instructions
         self.explain = True #used to pause the level and display explanation of controls until user input
-        self.crashed = False
+        self.paused = False #used to preserve the offRoad timer if game is paused, in case player pauses when offRoad
         self.stage_0_pass = False
         self.stage_1_pass = False
         self.stage_2_pass = False
@@ -33,7 +33,7 @@ class Tutorial(Level):
         #(self.stage## - the first digit denotes the stage, the second digit denotes the line of text)
         self.stage00 = "Welcome to our 2D Driving Simulator (I'm still not sure has a proper name)."
         self.stage01 = "Hold either up arrow or 'w' to drive the car forward. Hold space to stop the car."
-        self.stage02 = "Press the space bar to continue from this and other following screens."
+        self.stage02 = "Press any key to continue from this and other following screens. (Note: not the 'any' key. It doesn't exist.)"
         self.stage10 = "You actually stopped at the sign? Wow. That's rare. Thank you."
         self.stage11 = "Now, hold either down arrow or 'd' to reverse the car."
         self.stage12 = "It's like going forward, but backward!"
@@ -61,9 +61,9 @@ class Tutorial(Level):
         self.add_random_decorations(20)
 
         #timers and timer modifiers
-        self.timeOffroad = pygame.time.get_ticks() #tracks time player is off the road, used to fail player in certain cases
-        self.pauseTime = 0
-        self.time
+        self.timeOffroad = 0 #tracks time player is off the road, used to fail player in certain cases
+        self.pauseTime = 0 #tracks the time at pause
+        self.crashTimer = 0 #tracks the time at crash, used to delay fail message so explosion effects can play
 
         #initialize the player car sprite
         self.player = pygame.sprite.GroupSingle()
@@ -127,45 +127,41 @@ class Tutorial(Level):
     #update prints all the elements of the level to the screen as well as
     #checking pass/fail conditions of the level and returning pass/fail
     #if one of these conditions is met, depending on the condition
-    def update(self, screen):
-
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-
-
+    def update(self, screen):       
         if self.explain:
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                if event.type == pygame.KEYDOWN:
                     print("Input detected.")
                     self.explain = False
                     self.play = True
 
             screen.fill(self.BG_COLOR)
 
-            if self.stage == 0:
-                self.stage_instructions(screen, self.stage00, self.stage01, self.stage02)
+            match self.stage:
+                case 0:
+                    self.stage_instructions(screen, self.stage00, self.stage01, self.stage02)
 
-            if self.stage == 1:
-                self.stopped_at_sign = False
-                self.stage_instructions(screen, self.stage10, self.stage11, self.stage12)
+                case 1:
+                    self.stopped_at_sign = False
+                    self.stage_instructions(screen, self.stage10, self.stage11, self.stage12)
 
-            if self.stage == 2:
-                if self.needs_reset:
-                    self.reset_player()
-                    self.needs_reset = False
-                    self.stage_instructions(screen, self.stage_retry, self.stage21, self.stage22)
+                case 2:
+                    if self.needs_reset:
+                        self.reset_player()
+                        self.needs_reset = False
+                        self.stage_instructions(screen, self.stage_retry, self.stage21, self.stage22)
 
-                else:
-                    self.stage_instructions(screen, self.stage20, self.stage21, self.stage22)
-                        
-            if self.stage == 3:
-                if self.needs_reset:
-                    self.reset_player()
-                    self.needs_reset = False
-                    self.stage_instructions(screen, self.stage30, self.stage31, self.stage32)
+                    else:
+                        self.stage_instructions(screen, self.stage20, self.stage21, self.stage22)
+                            
+                case 3:
+                    if self.needs_reset:
+                        self.reset_player()
+                        self.needs_reset = False
+                        self.stage_instructions(screen, self.stage30, self.stage31, self.stage32)
 
-                else:
-                    self.stage_instructions(screen, self.stage30, self.stage31, self.stage32)
+                    else:
+                        self.stage_instructions(screen, self.stage30, self.stage31, self.stage32)
 
         if self.play:
 
@@ -221,20 +217,18 @@ class Tutorial(Level):
             
             self.check_bots()
 
-
             #this checks that the player is on the road
             onRoad = self.get_targets(self.playerCar)
 
-            #here be road rules
-                        
-            #records time
-            timer = pygame.time.get_ticks()
+            #here be road rules  
             if self.playerCar.isStopped():
                 #wait 3 seconds to allow explosion visual and sound to play
-                print(pygame.time.get_ticks() - timer)
-                if (pygame.time.get_ticks() - timer) >= 2000:
+                if (pygame.time.get_ticks() - self.crashTimer) >= 3000:
                     print("Crashed fail")
                     return "Fail"
+                
+            else:
+                self.crashTimer = pygame.time.get_ticks()
                 
             if len(onRoad) < 1 and not self.needs_reset:
                 if not self.playerCar.isOffRoad():
@@ -242,20 +236,22 @@ class Tutorial(Level):
                     self.timeOffroad = pygame.time.get_ticks()
                 
                 else:
-                    if pygame.time.get_ticks() - self.timeOffroad >= 1000:
+                    if pygame.time.get_ticks() - self.timeOffroad >= 3000:
                         print("Offroad fail")
                         return "Fail"
             
             else:
                 self.playerCar.offRoad = False
+                #records time
+                timer = pygame.time.get_ticks()
                 
-            if not self.stopped_at_sign:
+            if self.playerCar.rect.x < self.width / 2 - 65:
                 if (self.playerCar.rect.y < (self.height / 2) - 50) and (self.playerCar.getAngle() < 90 or self.playerCar.getAngle() > 270):
                     print("Crossed median fail 1")
                     return "Fail"
             
             if self.playerCar.getAngle() >= 260 and self.playerCar.getAngle() <= 300:
-                if (self.playerCar.rect.x < (self.width / 2) - 65):
+                if (self.playerCar.rect.x < (self.width / 2) - 65) and (self.playerCar.rect.x > (self.width / 3)):
                     print("Crossed median fail 2")
                     return "Fail"
                     
