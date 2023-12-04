@@ -242,8 +242,6 @@ class Tutorial(Level):
             
             else:
                 self.playerCar.offRoad = False
-                #records time
-                timer = pygame.time.get_ticks()
                 
             if self.playerCar.rect.x < self.width / 2 - 65:
                 if (self.playerCar.rect.y < (self.height / 2) - 50) and (self.playerCar.getAngle() < 90 or self.playerCar.getAngle() > 270):
