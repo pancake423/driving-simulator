@@ -6,18 +6,19 @@ class Tutorial(Level):
     level_title = "Stay on the Road!"
     level_overview = "Learn to control the vehicle, drive forward, back, stop, and turn."
 
-    #set font to 'Get Now.ttf', a free font found online
-    font = pygame.font.Font('fonts/Get Now.ttf', 50)
-
     #initialize/build the level
     def __init__(self, screen, screen_w, screen_h):
 
         super().__init__(screen_w, screen_h)
 
+        #set font to 'Get Now.ttf', a free font found online
+        self.font = pygame.font.Font('fonts/Get Now.ttf', 50)
+    
         #flags
         self.stopped_at_sign = False #used to check if player stopped at the stop sign
         self.play = False #used to allow the level to play after the player has read the instructions
         self.explain = True #used to pause the level and display explanation of controls until user input
+        self.need_reset = False #used to reset the player car when a fail condition has been achieved
 
         #0 is stop at sign, 1 is reverse back off-screen, 2 is stop at sign then turn left, 3 is stop at sign and turn right
         #-1 denotes the end of the level
@@ -37,6 +38,7 @@ class Tutorial(Level):
         self.stage30 = "You did it? You did it, of course you did it, I never doubted you. I swear!"
         self.stage31 = "Now, the final test. Stop at the stop sign, then turn left (left arrow or 'a')."
         self.stage32 = "Do that, and I'll be reeaaalllly impressed."
+        self.stage_retry = "Try again."
 
         #surfaces and rectangles for stage explanations
         self.stage_part_1_surf = None
@@ -73,7 +75,7 @@ class Tutorial(Level):
         self.botCar1.setCollide([self.player])
         self.botCar2.setCollide([self.player])
 
-    def stage_instuctions(self, screen, stage_part_1, stage_part_2, stage_part_3):
+    def stage_instructions(self, screen, stage_part_1, stage_part_2, stage_part_3):
         self.stage_part_1_surf = self.font.render(stage_part_1, False, 'red')
         self.stage_part_1_rect = self.stage_surf.get_rect(midtop = (self.width / 2, 200))
         self.stage_part_2_surf = self.font.render(stage_part_2, False, 'red')
@@ -103,6 +105,15 @@ class Tutorial(Level):
             self.botCar2.setCollide([self.player])
             self.playerCar.setCollide([self.bots])
 
+    def reset_player(self):
+        self.player.remove(self.playerCar)
+        self.playerCar.kill()
+        self.playerCar = PlayerCar((60, (screen_h / 2) + 65), 0)
+        self.player.add(self.playerCar)
+        self.playerCar.setCollide([self.bots])
+        self.botCar1.setCollide([self.player])
+        self.botCar2.setCollide([self.player])
+
 
     #update prints all the elements of the level to the screen as well as
     #checking pass/fail conditions of the level and returning pass/fail
@@ -118,17 +129,19 @@ class Tutorial(Level):
             match self.stage:
                 case 0:
                     self.stage_instructions(self.stage00, self.stage01, self.stage02)
-                    self.stage = 1
                 case 1:
                     self.stopped_at_sign = False
                     self.stage_instructions(self.stage10, self.stage11, self.stage12)
-                    self.stage = 2
                 case 2:
-                    self.stage_instructions(self.stage20, self.stage21, self.stage22)
-                    self.stage = 3
+                    if self.needs_reset:
+                        self.reset_player()
+                        self.stage_instructions(self.stage_retry, self.stage21, self.stage22)
+
+                    else:
+                        self.stage_instructions(self.stage20, self.stage21, self.stage22)
+                    
                 case 3:
                     self.stage_instructions(self.stage30, self.stage31, self.stage32)
-                    self.stage = -1
 
         if self.play:
 
@@ -138,19 +151,36 @@ class Tutorial(Level):
             self.bots.update()
             self.player.draw(screen)
             self.player.update()
+            if (self.playerCar.rect.x > (self.width / 3)) and (self.playerCar.rect.x < (self.width / 2) + 108):
+                if (self.playerCar.getSpeed() == 0):
+                    self.stopped_at_sign = True
+
             match self.stage:
                 case 0:
-                    if (self.playerCar.rect.x > (self.width / 3)) and (self.playerCar.rect.x < (self.width / 2) + 108):
-                        if (self.playerCar.getSpeed() == 0):
-                            self.stopped_at_sign = True
-                            self.stage = 1
-                            self.play = False
-                            self.explain = True
+                    if self.stopped_at_sign:
+                        self.stage = 1
+                        self.play = False
+                        self.explain = True
+
                 case 1:
                     if (self.playerCar.rect.x < self.width):
                         self.stage = 2
                         self.play = False
                         self.explain = True
+
+                case 2:
+                    if self.playerCar.getAngle() >= 100 and self.stopped_at_sign:
+                        self.needs_reset = True
+                        self.play = False
+                        self.explain = True
+                        
+                    if self.playerCar.rect.y > (self.height + 100) and self.stopped_at_sign:
+                        self.stage = 3
+                        self.play = False
+                        self.explain = True
+
+                case 3:
+                    if (self.playerCar.rect.x > self.width):
             
             self.check_bots()
 
@@ -200,9 +230,16 @@ class Tutorial(Level):
             
             else: 
                 return "NA"
+            
+    def pause(self):
+        self.pauseTime = pygame.time.get_ticks()
+        
+    def resume(self):
+        self.timeOffroad += pygame.time.get_ticks() - self.pauseTime
         
 if __name__ == "__main__":
     pygame.init()
+    pygame.font.init()
     screen_w = 1920
     screen_h = 1080
 

@@ -29,7 +29,7 @@ class LevelFive(Level):
         self.botList = [self.botCar1, self.botCar2]
         self.botCar1.setTarget(((screen_width + 100,screen_height/3 + 100),False))
         self.botCar2.setTarget(((screen_width + 100,screen_height/3 + 180),False))
-        self.last_spawned = pygame.time.get_ticks() #initializing this for later
+        self.last_spawned = None
         
         #Collisions
         self.playerCar.setCollide([self.bots])
@@ -42,7 +42,9 @@ class LevelFive(Level):
         self.bots.update()
         self.player.draw(screen)
         self.player.update()
-
+        
+        if self.last_spawned == None:
+            self.last_spawned = pygame.time.get_ticks()
         #Creates Bot Traffic
         self.botCount = 10
         #If there's less than botCount bot cars, create a new one
@@ -111,6 +113,13 @@ class LevelFive(Level):
         
         else:
             return "NA"
+        
+    def pause(self):
+        self.pauseTime = pygame.time.get_ticks()
+        
+    def resume(self):
+        self.last_spawned += pygame.time.get_ticks() - self.pauseTime
+        self.offRoadTimer += pygame.time.get_ticks() - self.pauseTime
         
 if __name__ == "__main__":
     pygame.init()
